@@ -50,6 +50,13 @@
             font-weight: 700;
         }
         
+        h3 {
+            color: #073b4c;
+            margin: 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #a8dadc;
+        }
+        
         p {
             margin-bottom: 20px;
             font-size: 1.2rem;
@@ -336,7 +343,7 @@
         }
         
         .admin-panel {
-            display: block;
+            display: none;
             margin-top: 30px;
             padding: 20px;
             background: #f8f9fa;
@@ -486,6 +493,45 @@
             transition: all 0.3s ease;
         }
         
+        .data-actions {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .data-btn {
+            padding: 12px 20px;
+            background: linear-gradient(to bottom, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .instructions {
+            background: #f1faee;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
@@ -516,6 +562,10 @@
             .admin-form {
                 grid-template-columns: 1fr;
             }
+            
+            .data-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -529,6 +579,27 @@
             <h1>Meme Quiz Creator</h1>
             <h2>Create Your Own Quiz!</h2>
             <p>Add your own questions and memes to create a custom quiz experience!</p>
+            
+            <div class="instructions">
+                <h3>How to use:</h3>
+                <ul>
+                    <li>Click the Admin button to add your own questions with memes</li>
+                    <li>Upload images/videos or paste URLs for memes</li>
+                    <li>Export your quiz data to share with others or use on different devices</li>
+                    <li>Import quiz data to load questions created by others</li>
+                </ul>
+                <p><strong>Note:</strong> Videos may autoplay muted due to browser policies. Click the unmute button on videos if needed.</p>
+            </div>
+            
+            <div class="data-actions">
+                <button class="data-btn" id="export-btn">
+                    <i class="fas fa-file-export"></i> Export Quiz Data
+                </button>
+                <button class="data-btn" id="import-btn">
+                    <i class="fas fa-file-import"></i> Import Quiz Data
+                </button>
+                <input type="file" id="import-file" accept=".json" style="display: none;">
+            </div>
             
             <div class="difficulty-select">
                 <button class="difficulty-btn noob" data-difficulty="noob">
@@ -665,13 +736,10 @@
     </div>
 
     <script>
-        // Clear any existing data from previous versions
-        localStorage.removeItem('memeQuizQuestions');
-        
-        // Use a new key to avoid conflicts with old data
+        // Use a key for localStorage
         const STORAGE_KEY = 'memeQuizQuestions_CleanVersion';
         
-        // Default empty questions - completely empty now
+        // Default empty questions
         const defaultQuestions = {
             noob: [],
             pro: [],
@@ -704,6 +772,9 @@
         const errorModal = document.getElementById('error-modal');
         const modalMessage = document.getElementById('modal-message');
         const modalOkBtn = document.getElementById('modal-ok-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const importFile = document.getElementById('import-file');
 
         // Quiz state
         let currentQuestions = [];
@@ -757,6 +828,11 @@
             modalOkBtn.addEventListener('click', () => {
                 errorModal.style.display = 'none';
             });
+            
+            // Export/import functionality
+            exportBtn.addEventListener('click', exportQuizData);
+            importBtn.addEventListener('click', () => importFile.click());
+            importFile.addEventListener('change', importQuizData);
             
             // Meme upload previews
             setupMemeUpload('display');
@@ -932,7 +1008,8 @@
                 video.alt = "Question meme";
                 video.autoplay = true;
                 video.loop = true;
-                video.muted = true;
+                video.muted = true; // Start muted due to browser autoplay policies
+                video.controls = true; // Add controls so user can unmute if needed
                 memeContainer.appendChild(video);
             }
             
@@ -972,6 +1049,9 @@
         }
 
         function selectOption(selectedIndex, correctIndex) {
+            // If already answered this question, don't allow changing
+            if (userAnswers[currentQuestionIndex] !== null) return;
+            
             userAnswers[currentQuestionIndex] = selectedIndex;
             
             // Update visual selection
@@ -985,11 +1065,8 @@
             
             // Check if answer is correct
             if (selectedIndex === correctIndex) {
-                // Only add score if this is the first time answering this question
-                if (userAnswers[currentQuestionIndex] !== correctIndex) {
-                    score++;
-                    scoreElement.textContent = score;
-                }
+                score++;
+                scoreElement.textContent = score;
                 options[selectedIndex].classList.add('correct');
             } else {
                 options[selectedIndex].classList.add('incorrect');
@@ -1010,7 +1087,8 @@
                 video.alt = "Answer meme";
                 video.autoplay = true;
                 video.loop = true;
-                video.muted = true;
+                video.muted = true; // Start muted due to browser autoplay policies
+                video.controls = true; // Add controls so user can unmute if needed
                 afterMemeContainer.appendChild(video);
             }
             afterMemeContainer.style.display = 'flex';
@@ -1171,6 +1249,56 @@
             }
             
             alert(message);
+        }
+
+        function exportQuizData() {
+            const dataStr = JSON.stringify(questions);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'meme-quiz-data.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function importQuizData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validate the imported data structure
+                    if (importedData && 
+                        importedData.noob !== undefined && 
+                        importedData.pro !== undefined && 
+                        importedData.hacker !== undefined) {
+                        
+                        if (confirm("Importing quiz data will replace your current questions. Continue?")) {
+                            questions = importedData;
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
+                            
+                            // Update UI
+                            updateDifficultyButtons();
+                            updateStartMessage();
+                            
+                            showModal("Quiz data imported successfully!");
+                        }
+                    } else {
+                        showModal("Invalid quiz data format. Please import a valid JSON file.");
+                    }
+                } catch (error) {
+                    showModal("Error parsing JSON file. Please make sure it's a valid quiz data file.");
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset the file input
+            event.target.value = '';
         }
 
         // Initialize the quiz
