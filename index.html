@@ -21,6 +21,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
         
         .container {
@@ -636,6 +637,20 @@
             font-size: 0.9rem;
         }
         
+        /* Credits section */
+        .credits {
+            margin-top: 30px;
+            padding: 15px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .credits strong {
+            color: #118ab2;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
@@ -678,6 +693,11 @@
             .toggle-admin {
                 padding: 10px 15px;
                 font-size: 0.9rem;
+            }
+            
+            .credits {
+                font-size: 0.9rem;
+                padding: 10px;
             }
         }
     </style>
@@ -859,6 +879,11 @@
                     <button class="admin-btn" id="reset-questions-btn" style="background: #ef476f;"><i class="fas fa-trash"></i> Reset All</button>
                 </div>
             </div>
+        </div>
+        
+        <!-- Credits section -->
+        <div class="credits">
+            <p>Created by <strong>naamra</strong> - A student of X-E (CRPF Public School)</p>
         </div>
     </div>
 
@@ -1388,7 +1413,7 @@
                 };
             }
             
-            const shuffledData = questionShuffleMap[questionKey];
+            shuffledData = questionShuffleMap[questionKey];
             
             shuffledData.options.forEach((option, index) => {
                 const optionElement = document.createElement('div');
@@ -1645,7 +1670,7 @@
                 if (quizData.questions[levelId].length === 0) {
                     message += "No questions yet\n\n";
                 } else {
-                    quizData.questions[levelId].forEach((q, i) => {
+                    quizData.questions[levelId].forEach((q, i) =>{
                         message += `${i+1}. ${q.question}\n`;
                         message += `   Correct Answer: ${q.options[0]}\n\n`;
                     });
