@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Life, My Quiz!!!r</title>
+    <title>Custom Meme Quiz Creator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -404,13 +404,22 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            padding: 10px 15px;
-            background: #6a11cb;
+            padding: 12px 20px;
+            background: linear-gradient(to bottom, #6a11cb, #2575fc);
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-admin:hover {
+            background: linear-gradient(to bottom, #2575fc, #6a11cb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         
         .meme-preview {
@@ -532,6 +541,61 @@
             margin-bottom: 8px;
         }
         
+        .level-manager {
+            margin: 25px 0;
+            padding: 20px;
+            background: #e9f5db;
+            border-radius: 15px;
+        }
+        
+        .level-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .level-item {
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .level-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .level-action-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .level-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .color-preview {
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
@@ -566,13 +630,22 @@
             .data-actions {
                 flex-direction: column;
             }
+            
+            .level-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .toggle-admin {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <button class="toggle-admin" id="toggle-admin">
-            <i class="fas fa-cog"></i> Admin
+            <i class="fas fa-plus-circle"></i> Create your Quiz
         </button>
         
         <div id="start-screen">
@@ -583,7 +656,8 @@
             <div class="instructions">
                 <h3>How to use:</h3>
                 <ul>
-                    <li>Click the Admin button to add your own questions with memes</li>
+                    <li>Click the "Create your Quiz" button to add your own questions with memes</li>
+                    <li>Create up to 5 custom levels with different colors</li>
                     <li>Upload images/videos or paste URLs for memes</li>
                     <li>Export your quiz data to share with others or use on different devices</li>
                     <li>Import quiz data to load questions created by others</li>
@@ -601,22 +675,11 @@
                 <input type="file" id="import-file" accept=".json" style="display: none;">
             </div>
             
-            <div class="difficulty-select">
-                <button class="difficulty-btn noob" data-difficulty="noob">
-                    <i class="fas fa-baby"></i>
-                    Noob Level
-                </button>
-                <button class="difficulty-btn pro" data-difficulty="pro">
-                    <i class="fas fa-user-graduate"></i>
-                    Pro Level
-                </button>
-                <button class="difficulty-btn hacker" data-difficulty="hacker">
-                    <i class="fas fa-glasses"></i>
-                    Hacker Level
-                </button>
+            <div class="difficulty-select" id="level-buttons">
+                <!-- Level buttons will be generated here -->
             </div>
             
-            <p class="funny-message" id="start-message">No questions yet! Use the admin panel to add your own questions and memes.</p>
+            <p class="funny-message" id="start-message">No levels yet! Click 'Create your Quiz' to create levels and add questions.</p>
         </div>
         
         <div id="quiz-container" class="quiz-container">
@@ -654,13 +717,42 @@
             <h2>Quiz Creator Panel</h2>
             <p>Add your own questions and memes to the quiz! (Changes are saved to your browser's storage)</p>
             
+            <div class="level-manager">
+                <h3>Level Manager</h3>
+                <p>Create up to 5 custom levels for your quiz</p>
+                
+                <div class="level-form">
+                    <div class="form-group">
+                        <label for="level-name">Level Name</label>
+                        <input type="text" id="level-name" placeholder="Enter level name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="level-color1">Color 1</label>
+                        <input type="color" id="level-color1" value="#ffd166">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="level-color2">Color 2</label>
+                        <input type="color" id="level-color2" value="#ffb700">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="admin-btn" id="add-level-btn"><i class="fas fa-plus"></i> Add Level</button>
+                    </div>
+                </div>
+                
+                <div class="level-list" id="level-list">
+                    <!-- Levels will be listed here -->
+                </div>
+            </div>
+            
             <div class="admin-form">
                 <div class="form-group full-width">
-                    <label for="admin-difficulty">Difficulty Level</label>
+                    <label for="admin-difficulty">Level</label>
                     <select id="admin-difficulty">
-                        <option value="noob">Noob</option>
-                        <option value="pro">Pro</option>
-                        <option value="hacker">Hacker</option>
+                        <!-- Levels will be populated here -->
                     </select>
                 </div>
                 
@@ -737,13 +829,12 @@
 
     <script>
         // Use a key for localStorage
-        const STORAGE_KEY = 'memeQuizQuestions_CleanVersion';
+        const STORAGE_KEY = 'memeQuizQuestions_CustomLevels';
         
-        // Default empty questions
-        const defaultQuestions = {
-            noob: [],
-            pro: [],
-            hacker: []
+        // Default empty questions with custom levels
+        const defaultData = {
+            levels: [],
+            questions: {}
         };
 
         // DOM elements
@@ -761,61 +852,57 @@
         const prevButton = document.getElementById('prev-btn');
         const nextButton = document.getElementById('next-btn');
         const playAgainButton = document.getElementById('play-again');
-        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
-        const levelIndicator = document.getElementById('level-indicator');
+        const startMessage = document.getElementById('start-message');
         const adminPanel = document.getElementById('admin-panel');
         const toggleAdminBtn = document.getElementById('toggle-admin');
         const addQuestionBtn = document.getElementById('add-question-btn');
         const resetQuestionsBtn = document.getElementById('reset-questions-btn');
         const viewQuestionsBtn = document.getElementById('view-questions-btn');
-        const startMessage = document.getElementById('start-message');
         const errorModal = document.getElementById('error-modal');
         const modalMessage = document.getElementById('modal-message');
         const modalOkBtn = document.getElementById('modal-ok-btn');
         const exportBtn = document.getElementById('export-btn');
         const importBtn = document.getElementById('import-btn');
         const importFile = document.getElementById('import-file');
+        const levelButtonsContainer = document.getElementById('level-buttons');
+        const levelList = document.getElementById('level-list');
+        const levelNameInput = document.getElementById('level-name');
+        const levelColor1Input = document.getElementById('level-color1');
+        const levelColor2Input = document.getElementById('level-color2');
+        const addLevelBtn = document.getElementById('add-level-btn');
+        const levelSelect = document.getElementById('admin-difficulty');
 
         // Quiz state
+        let currentLevelId = '';
         let currentQuestions = [];
-        let currentDifficulty = '';
         let currentQuestionIndex = 0;
         let score = 0;
         let userAnswers = [];
-        let questions = {};
-        let questionShuffleMap = {}; // To track the shuffled order of options
+        let quizData = {};
+        let questionShuffleMap = {};
 
         // Initialize the quiz
         function initQuiz() {
             // Load questions from localStorage or use defaults
-            const savedQuestions = localStorage.getItem(STORAGE_KEY);
-            if (savedQuestions) {
-                questions = JSON.parse(savedQuestions);
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                quizData = JSON.parse(savedData);
             } else {
-                questions = JSON.parse(JSON.stringify(defaultQuestions));
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
+                quizData = JSON.parse(JSON.stringify(defaultData));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
             }
 
             // Update UI based on questions
-            updateDifficultyButtons();
+            updateLevelButtons();
+            updateLevelSelect();
+            updateLevelList();
             updateStartMessage();
 
-            difficultyButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    currentDifficulty = button.getAttribute('data-difficulty');
-                    if (questions[currentDifficulty].length > 0) {
-                        startQuiz();
-                    } else {
-                        showModal("You can't play this level as this has no questions in it.");
-                    }
-                });
-            });
-
-            // Admin panel functionality
+            // Event listeners
             toggleAdminBtn.addEventListener('click', () => {
                 if (adminPanel.style.display === 'block') {
                     adminPanel.style.display = 'none';
-                    toggleAdminBtn.innerHTML = '<i class="fas fa-cog"></i> Admin';
+                    toggleAdminBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Create your Quiz';
                 } else {
                     adminPanel.style.display = 'block';
                     toggleAdminBtn.innerHTML = '<i class="fas fa-times"></i> Close';
@@ -833,6 +920,9 @@
             exportBtn.addEventListener('click', exportQuizData);
             importBtn.addEventListener('click', () => importFile.click());
             importFile.addEventListener('change', importQuizData);
+            
+            // Level management
+            addLevelBtn.addEventListener('click', addCustomLevel);
             
             // Meme upload previews
             setupMemeUpload('display');
@@ -874,29 +964,123 @@
         // Function to shuffle array (Fisher-Yates algorithm)
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+                const j = Math.floor(Math.random() (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
             return array;
         }
 
-        function updateDifficultyButtons() {
-            difficultyButtons.forEach(button => {
-                const difficulty = button.getAttribute('data-difficulty');
-                if (questions[difficulty].length === 0) {
+        function updateLevelButtons() {
+            levelButtonsContainer.innerHTML = '';
+            
+            if (quizData.levels.length === 0) {
+                levelButtonsContainer.innerHTML = '<p>No levels created yet. Use the admin panel to create levels.</p>';
+                return;
+            }
+            
+            quizData.levels.forEach(level => {
+                const button = document.createElement('button');
+                button.classList.add('difficulty-btn');
+                button.setAttribute('data-level', level.id);
+                
+                // Set gradient background
+                button.style.background = `linear-gradient(to bottom, ${level.color1}, ${level.color2})`;
+                
+                // Set text color based on brightness of first color
+                const color = hexToRgb(level.color1);
+                const brightness = (color.r * 299 + color.g * 587 + color.b * 114) / 1000;
+                button.style.color = brightness > 125 ? '#333' : 'white';
+                
+                button.innerHTML = `
+                    <i class="fas fa-signal"></i>
+                    ${level.name}
+                `;
+                
+                // Check if level has questions
+                if (!quizData.questions[level.id] || quizData.questions[level.id].length === 0) {
                     button.classList.add('disabled-btn');
                 } else {
-                    button.classList.remove('disabled-btn');
+                    button.addEventListener('click', () => {
+                        currentLevelId = level.id;
+                        startQuiz();
+                    });
                 }
+                
+                levelButtonsContainer.appendChild(button);
+            });
+        }
+
+        function updateLevelSelect() {
+            levelSelect.innerHTML = '';
+            
+            if (quizData.levels.length === 0) {
+                levelSelect.innerHTML = '<option value="">No levels available</option>';
+                return;
+            }
+            
+            quizData.levels.forEach(level => {
+                const option = document.createElement('option');
+                option.value = level.id;
+                option.textContent = level.name;
+                levelSelect.appendChild(option);
+            });
+        }
+
+        function updateLevelList() {
+            levelList.innerHTML = '';
+            
+            if (quizData.levels.length === 0) {
+                levelList.innerHTML = '<p>No levels created yet</p>';
+                return;
+            }
+            
+            quizData.levels.forEach(level => {
+                const levelItem = document.createElement('div');
+                levelItem.classList.add('level-item');
+                levelItem.style.background = `linear-gradient(to right, ${level.color1}, ${level.color2})`;
+                
+                const questionCount = quizData.questions[level.id] ? quizData.questions[level.id].length : 0;
+                
+                levelItem.innerHTML = `
+                    <div>
+                        <div>${level.name}</div>
+                        <small>${questionCount} question${questionCount !== 1 ? 's' : ''}</small>
+                    </div>
+                    <div class="level-actions">
+                        <button class="level-action-btn" data-action="edit" data-level="${level.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="level-action-btn" data-action="delete" data-level="${level.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                levelList.appendChild(levelItem);
+            });
+            
+            // Add event listeners for edit and delete buttons
+            document.querySelectorAll('.level-action-btn[data-action="delete"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const levelId = btn.getAttribute('data-level');
+                    deleteLevel(levelId);
+                });
+            });
+            
+            document.querySelectorAll('.level-action-btn[data-action="edit"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const levelId = btn.getAttribute('data-level');
+                    editLevel(levelId);
+                });
             });
         }
 
         function updateStartMessage() {
-            const totalQuestions = Object.values(questions).reduce((acc, curr) => acc + curr.length, 0);
+            const totalQuestions = Object.values(quizData.questions).reduce((acc, curr) => acc + curr.length, 0);
             if (totalQuestions === 0) {
-                startMessage.textContent = "No questions yet! Use the admin panel to add questions and memes.";
+                startMessage.textContent = "No questions yet! Click 'Create your Quiz' to create levels and add questions.";
             } else {
-                startMessage.textContent = "Select a difficulty level to start the quiz!";
+                startMessage.textContent = "Select a level to start the quiz!";
             }
         }
 
@@ -958,10 +1142,97 @@
             });
         }
 
+        function addCustomLevel() {
+            const name = levelNameInput.value.trim();
+            const color1 = levelColor1Input.value;
+            const color2 = levelColor2Input.value;
+            
+            if (!name) {
+                showModal("Please enter a level name!");
+                return;
+            }
+            
+            if (quizData.levels.length >= 5) {
+                showModal("You can only create up to 5 levels!");
+                return;
+            }
+            
+            // Create a simple ID for the level
+            const id = name.toLowerCase().replace(/\s+/g, '-');
+            
+            // Check if level with this name already exists
+            if (quizData.levels.some(level => level.id === id)) {
+                showModal("A level with this name already exists!");
+                return;
+            }
+            
+            // Add the new level
+            quizData.levels.push({
+                id,
+                name,
+                color1,
+                color2
+            });
+            
+            // Initialize empty questions array for this level
+            if (!quizData.questions[id]) {
+                quizData.questions[id] = [];
+            }
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+            
+            // Update UI
+            updateLevelButtons();
+            updateLevelSelect();
+            updateLevelList();
+            
+            // Reset form
+            levelNameInput.value = '';
+            
+            showModal(`Level "${name}" created successfully!`);
+        }
+
+        function deleteLevel(levelId) {
+            if (!confirm("Are you sure you want to delete this level? All questions in this level will also be deleted.")) {
+                return;
+            }
+            
+            // Remove level from levels array
+            quizData.levels = quizData.levels.filter(level => level.id !== levelId);
+            
+            // Remove questions for this level
+            delete quizData.questions[levelId];
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+            
+            // Update UI
+            updateLevelButtons();
+            updateLevelSelect();
+            updateLevelList();
+            
+            showModal("Level deleted successfully!");
+        }
+
+        function editLevel(levelId) {
+            // For simplicity, we'll just allow deletion and recreation
+            // In a more advanced version, you could implement a proper edit form
+            const level = quizData.levels.find(l => l.id === levelId);
+            if (level) {
+                levelNameInput.value = level.name;
+                levelColor1Input.value = level.color1;
+                levelColor2Input.value = level.color2;
+                
+                // Delete the old level and create a new one when Add is clicked
+                deleteLevel(levelId);
+            }
+        }
+
         function startQuiz() {
             // Double-check that we have questions
-            if (questions[currentDifficulty].length === 0) {
-                showModal("No questions available for this difficulty level. Please add questions first.");
+            if (!quizData.questions[currentLevelId] || quizData.questions[currentLevelId].length === 0) {
+                showModal("No questions available for this level. Please add questions first.");
                 return;
             }
             
@@ -969,9 +1240,9 @@
             quizContainer.style.display = 'block';
             resultContainer.style.display = 'none';
             adminPanel.style.display = 'none';
-            toggleAdminBtn.innerHTML = '<i class="fas fa-cog"></i> Admin';
+            toggleAdminBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Create your Quiz';
             
-            currentQuestions = questions[currentDifficulty];
+            currentQuestions = quizData.questions[currentLevelId];
             currentQuestionIndex = 0;
             score = 0;
             userAnswers = new Array(currentQuestions.length).fill(null);
@@ -979,13 +1250,22 @@
             scoreElement.textContent = score;
             
             // Set level indicator
-            levelIndicator.textContent = `${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} Level`;
-            levelIndicator.style.background = getComputedStyle(document.querySelector(`.${currentDifficulty}`)).backgroundImage;
+            const currentLevel = quizData.levels.find(level => level.id === currentLevelId);
+            if (currentLevel) {
+                document.getElementById('level-indicator').textContent = currentLevel.name;
+                document.getElementById('level-indicator').style.background = `linear-gradient(to right, ${currentLevel.color1}, ${currentLevel.color2})`;
+            }
             
             showQuestion();
         }
 
         function showQuestion() {
+            // Check if we have questions
+            if (currentQuestions.length === 0 || currentQuestionIndex >= currentQuestions.length) {
+                showModal("No questions available or invalid question index.");
+                return;
+            }
+            
             const question = currentQuestions[currentQuestionIndex];
             questionElement.textContent = question.question;
             
@@ -997,27 +1277,31 @@
             
             // Display meme
             memeContainer.innerHTML = '';
-            if (question.displayMeme.type === 'image') {
-                const img = document.createElement('img');
-                img.src = question.displayMeme.url;
-                img.alt = "Question meme";
-                memeContainer.appendChild(img);
+            if (question.displayMeme && question.displayMeme.url) {
+                if (question.displayMeme.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = question.displayMeme.url;
+                    img.alt = "Question meme";
+                    memeContainer.appendChild(img);
+                } else {
+                    const video = document.createElement('video');
+                    video.src = question.displayMeme.url;
+                    video.alt = "Question meme";
+                    video.autoplay = true;
+                    video.loop = true;
+                    video.muted = true;
+                    video.controls = true;
+                    memeContainer.appendChild(video);
+                }
             } else {
-                const video = document.createElement('video');
-                video.src = question.displayMeme.url;
-                video.alt = "Question meme";
-                video.autoplay = true;
-                video.loop = true;
-                video.muted = true; // Start muted due to browser autoplay policies
-                video.controls = true; // Add controls so user can unmute if needed
-                memeContainer.appendChild(video);
+                memeContainer.innerHTML = '<p>No meme available</p>';
             }
             
             // Display options in shuffled order
             optionsElement.innerHTML = '';
             
             // Create a unique key for this question to remember its shuffle order
-            const questionKey = `${currentDifficulty}_${currentQuestionIndex}`;
+            const questionKey = `${currentLevelId}_${currentQuestionIndex}`;
             
             // If we haven't shuffled this question before, do it now
             if (!questionShuffleMap[questionKey]) {
@@ -1056,7 +1340,7 @@
             
             // Update visual selection
             const options = optionsElement.querySelectorAll('.option');
-            options.forEach((option, index) => {
+            options.forEach((option, index) =>{
                 option.classList.remove('selected', 'correct', 'incorrect');
                 if (index === selectedIndex) {
                     option.classList.add('selected');
@@ -1076,22 +1360,24 @@
             // Show after-answer meme
             afterMemeContainer.innerHTML = '';
             const question = currentQuestions[currentQuestionIndex];
-            if (question.afterMeme.type === 'image') {
-                const img = document.createElement('img');
-                img.src = question.afterMeme.url;
-                img.alt = "Answer meme";
-                afterMemeContainer.appendChild(img);
-            } else {
-                const video = document.createElement('video');
-                video.src = question.afterMeme.url;
-                video.alt = "Answer meme";
-                video.autoplay = true;
-                video.loop = true;
-                video.muted = true; // Start muted due to browser autoplay policies
-                video.controls = true; // Add controls so user can unmute if needed
-                afterMemeContainer.appendChild(video);
+            if (question.afterMeme && question.afterMeme.url) {
+                if (question.afterMeme.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = question.afterMeme.url;
+                    img.alt = "Answer meme";
+                    afterMemeContainer.appendChild(img);
+                } else {
+                    const video = document.createElement('video');
+                    video.src = question.afterMeme.url;
+                    video.alt = "Answer meme";
+                    video.autoplay = true;
+                    video.loop = true;
+                    video.muted = true;
+                    video.controls = true;
+                    afterMemeContainer.appendChild(video);
+                }
+                afterMemeContainer.style.display = 'flex';
             }
-            afterMemeContainer.style.display = 'flex';
             
             // Enable next button
             nextButton.disabled = false;
@@ -1150,8 +1436,40 @@
             questionShuffleMap = {};
         });
 
+        function resetAdminForm() {
+            // Reset all form fields
+            document.getElementById('admin-question').value = '';
+            document.getElementById('admin-option1').value = '';
+            document.getElementById('admin-option2').value = '';
+            document.getElementById('admin-option3').value = '';
+            document.getElementById('admin-option4').value = '';
+            
+            // Reset meme URLs
+            document.getElementById('admin-display-meme-url').value = '';
+            document.getElementById('admin-after-meme-url').value = '';
+            
+            // Reset file inputs
+            document.getElementById('admin-display-meme-upload').value = '';
+            document.getElementById('admin-after-meme-upload').value = '';
+            
+            // Reset previews
+            document.getElementById('display-meme-preview').style.display = 'none';
+            document.getElementById('display-video-preview').style.display = 'none';
+            document.getElementById('after-meme-preview').style.display = 'none';
+            document.getElementById('after-video-preview').style.display = 'none';
+            
+            // Reset meme type buttons to image
+            document.querySelectorAll('.meme-type-btn').forEach(btn => {
+                if (btn.getAttribute('data-type') === 'image') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
         function addCustomQuestion() {
-            const difficulty = document.getElementById('admin-difficulty').value;
+            const levelId = levelSelect.value;
             const questionText = document.getElementById('admin-question').value;
             const option1 = document.getElementById('admin-option1').value;
             const option2 = document.getElementById('admin-option2').value;
@@ -1167,6 +1485,11 @@
             const afterMemeUrl = document.getElementById('admin-after-meme-url').value;
 
             // Validate inputs
+            if (!levelId) {
+                showModal("Please select a level first!");
+                return;
+            }
+            
             if (!questionText || !option1 || !option2 || !option3 || !option4 || !displayMemeUrl || !afterMemeUrl) {
                 showModal("Please fill in all fields!");
                 return;
@@ -1175,8 +1498,8 @@
             // Create new question object
             const newQuestion = {
                 question: questionText,
-                options: [option1, option2, option3, option4], // Correct answer is always first
-                correct: 0, // This will be the index of the correct answer in the original array
+                options: [option1, option2, option3, option4],
+                correct: 0,
                 displayMeme: {
                     type: displayMemeType,
                     url: displayMemeUrl
@@ -1188,43 +1511,33 @@
             };
 
             // Add to questions
-            if (!questions[difficulty]) {
-                questions[difficulty] = [];
+            if (!quizData.questions[levelId]) {
+                quizData.questions[levelId] = [];
             }
-            questions[difficulty].push(newQuestion);
+            quizData.questions[levelId].push(newQuestion);
 
             // Save to localStorage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
 
-            // Reset form
-            document.getElementById('admin-question').value = '';
-            document.getElementById('admin-option1').value = '';
-            document.getElementById('admin-option2').value = '';
-            document.getElementById('admin-option3').value = '';
-            document.getElementById('admin-option4').value = '';
-            document.getElementById('admin-display-meme-url').value = '';
-            document.getElementById('admin-after-meme-url').value = '';
-            document.getElementById('display-meme-preview').style.display = 'none';
-            document.getElementById('display-video-preview').style.display = 'none';
-            document.getElementById('after-meme-preview').style.display = 'none';
-            document.getElementById('after-video-preview').style.display = 'none';
-            document.getElementById('admin-display-meme-upload').value = '';
-            document.getElementById('admin-after-meme-upload').value = '';
+            // Reset the form
+            resetAdminForm();
 
             // Update UI
-            updateDifficultyButtons();
+            updateLevelButtons();
+            updateLevelList();
             updateStartMessage();
             
-            showModal(`Question added to ${difficulty} level! The correct answer will be randomly positioned.`);
+            showModal(`Question added to level! The correct answer will be randomly positioned.`);
         }
 
         function resetQuestions() {
             if (confirm("Are you sure you want to reset all questions? This cannot be undone.")) {
-                questions = JSON.parse(JSON.stringify(defaultQuestions));
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
+                quizData.questions = {};
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
                 
                 // Update UI
-                updateDifficultyButtons();
+                updateLevelButtons();
+                updateLevelList();
                 updateStartMessage();
                 
                 showModal("All questions have been reset!");
@@ -1234,13 +1547,16 @@
         function viewQuestions() {
             let message = "Current Questions:\n\n";
             
-            for (const level in questions) {
-                message += `--- ${level.toUpperCase()} LEVEL (${questions[level].length} questions) ---\n`;
+            for (const levelId in quizData.questions) {
+                const level = quizData.levels.find(l => l.id === levelId);
+                const levelName = level ? level.name : levelId;
                 
-                if (questions[level].length === 0) {
+                message += `--- ${levelName.toUpperCase()} (${quizData.questions[levelId].length} questions) ---\n`;
+                
+                if (quizData.questions[levelId].length === 0) {
                     message += "No questions yet\n\n";
                 } else {
-                    questions[level].forEach((q, i) => {
+                    quizData.questions[levelId].forEach((q, i) => {
                         message += `${i+1}. ${q.question}\n`;
                         message += `   Correct Answer: ${q.options[0]}\n\n`;
                     });
@@ -1252,7 +1568,7 @@
         }
 
         function exportQuizData() {
-            const dataStr = JSON.stringify(questions);
+            const dataStr = JSON.stringify(quizData);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
             const exportFileDefaultName = 'meme-quiz-data.json';
@@ -1274,16 +1590,17 @@
                     
                     // Validate the imported data structure
                     if (importedData && 
-                        importedData.noob !== undefined && 
-                        importedData.pro !== undefined && 
-                        importedData.hacker !== undefined) {
+                        importedData.levels !== undefined && 
+                        importedData.questions !== undefined) {
                         
-                        if (confirm("Importing quiz data will replace your current questions. Continue?")) {
-                            questions = importedData;
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
+                        if (confirm("Importing quiz data will replace your current data. Continue?")) {
+                            quizData = importedData;
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
                             
                             // Update UI
-                            updateDifficultyButtons();
+                            updateLevelButtons();
+                            updateLevelSelect();
+                            updateLevelList();
                             updateStartMessage();
                             
                             showModal("Quiz data imported successfully!");
@@ -1299,6 +1616,16 @@
             
             // Reset the file input
             event.target.value = '';
+        }
+
+        // Helper function to convert hex color to RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {r: 0, g: 0, b: 0};
         }
 
         // Initialize the quiz
