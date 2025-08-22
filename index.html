@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Meme Quiz Creator</title>
+    <title>My Life, My Quiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -134,7 +134,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
-        .meme-container {
+        .media-container {
             margin: 25px 0;
             border-radius: 15px;
             overflow: hidden;
@@ -146,26 +146,11 @@
             background: #000;
         }
         
-        .meme-container img, .meme-container video {
-            width: 100%;
-            height: auto;
-            max-height: 350px;
-            object-fit: contain;
-        }
-        
-        .after-meme-container {
+        .media-container.hidden {
             display: none;
-            margin: 25px 0;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            max-height: 350px;
-            justify-content: center;
-            align-items: center;
-            background: #000;
         }
         
-        .after-meme-container img, .after-meme-container video {
+        .media-container img, .media-container video {
             width: 100%;
             height: auto;
             max-height: 350px;
@@ -422,7 +407,7 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         
-        .meme-preview {
+        .media-preview {
             max-width: 100%;
             max-height: 200px;
             margin-top: 10px;
@@ -430,20 +415,20 @@
             display: none;
         }
         
-        .meme-upload-section {
+        .media-upload-section {
             border: 2px dashed #a8dadc;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 15px;
         }
         
-        .meme-type-selector {
+        .media-type-selector {
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
         }
         
-        .meme-type-btn {
+        .media-type-btn {
             padding: 10px 15px;
             background: #e2f0e6;
             border: 2px solid #a8dadc;
@@ -452,7 +437,7 @@
             font-weight: 600;
         }
         
-        .meme-type-btn.active {
+        .media-type-btn.active {
             background: #a8dadc;
             border-color: #118ab2;
         }
@@ -596,6 +581,61 @@
             border: 2px solid #ccc;
         }
         
+        /* After-answer media overlay */
+        .after-media-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .after-media-container {
+            width: 90%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .after-media-container img, 
+        .after-media-container video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        
+        .close-after-media {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: linear-gradient(to bottom, #ffd166, #ffb700);
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .close-after-media:hover {
+            background: linear-gradient(to bottom, #ffb700, #ff9e00);
+            transform: scale(1.05);
+        }
+        
+        .optional-label {
+            font-style: italic;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
@@ -649,16 +689,16 @@
         </button>
         
         <div id="start-screen">
-            <h1>Meme Quiz Creator</h1>
-            <h2>Create Your Own Quiz!</h2>
-            <p>Add your own questions and memes to create a custom quiz experience!</p>
+            <h1>My Life, My Quiz</h1>
+            <h2>Create Your Personal Quiz!</h2>
+            <p>Add your own questions and media to create a custom quiz experience!</p>
             
             <div class="instructions">
                 <h3>How to use:</h3>
                 <ul>
-                    <li>Click the "Create your Quiz" button to add your own questions with memes</li>
+                    <li>Click the "Create your Quiz" button to add your own questions with media</li>
                     <li>Create up to 5 custom levels with different colors</li>
-                    <li>Upload images/videos or paste URLs for memes</li>
+                    <li>Upload images/videos or paste URLs for media (optional)</li>
                     <li>Export your quiz data to share with others or use on different devices</li>
                     <li>Import quiz data to load questions created by others</li>
                 </ul>
@@ -689,15 +729,11 @@
             </div>
             <div class="question" id="question"></div>
             
-            <div class="meme-container" id="meme-container">
-                <!-- Display meme will be inserted here -->
+            <div class="media-container hidden" id="media-container">
+                <!-- Display media will be inserted here -->
             </div>
             
             <div class="options" id="options"></div>
-            
-            <div class="after-meme-container" id="after-meme-container">
-                <!-- After-answer meme will be inserted here -->
-            </div>
             
             <div class="navigation">
                 <button class="nav-btn" id="prev-btn" disabled><i class="fas fa-arrow-left"></i> Previous</button>
@@ -713,9 +749,17 @@
             <button class="play-again" id="play-again"><i class="fas fa-redo"></i> Play Again</button>
         </div>
         
+        <!-- After-answer media overlay -->
+        <div class="after-media-overlay" id="after-media-overlay">
+            <div class="after-media-container" id="after-media-container">
+                <!-- After-answer media will be inserted here -->
+            </div>
+            <button class="close-after-media" id="close-after-media">Continue</button>
+        </div>
+        
         <div id="admin-panel" class="admin-panel">
             <h2>Quiz Creator Panel</h2>
-            <p>Add your own questions and memes to the quiz! (Changes are saved to your browser's storage)</p>
+            <p>Add your own questions and media to the quiz! (Changes are saved to your browser's storage)</p>
             
             <div class="level-manager">
                 <h3>Level Manager</h3>
@@ -782,30 +826,30 @@
                 </div>
                 
                 <div class="form-group full-width">
-                    <h3>Display Meme (Shows with question)</h3>
-                    <div class="meme-type-selector">
-                        <button type="button" class="meme-type-btn active" data-type="image" data-for="display">Image</button>
-                        <button type="button" class="meme-type-btn" data-type="video" data-for="display">Video</button>
+                    <h3>Display Media (Shows with question) <span class="optional-label">(Optional)</span></h3>
+                    <div class="media-type-selector">
+                        <button type="button" class="media-type-btn active" data-type="image" data-for="display">Image</button>
+                        <button type="button" class="media-type-btn" data-type="video" data-for="display">Video</button>
                     </div>
-                    <div class="meme-upload-section">
-                        <input type="file" id="admin-display-meme-upload" accept="image/*,video/*">
-                        <input type="text" id="admin-display-meme-url" placeholder="Or paste URL here">
-                        <img id="display-meme-preview" class="meme-preview" alt="Meme preview">
-                        <video id="display-video-preview" class="meme-preview" controls style="display:none"></video>
+                    <div class="media-upload-section">
+                        <input type="file" id="admin-display-media-upload" accept="image/*,video/*">
+                        <input type="text" id="admin-display-media-url" placeholder="Paste URL here (optional)">
+                        <img id="display-media-preview" class="media-preview" alt="Media preview">
+                        <video id="display-video-preview" class="media-preview" controls style="display:none"></video>
                     </div>
                 </div>
                 
                 <div class="form-group full-width">
-                    <h3>After-Answer Meme (Shows after answering)</h3>
-                    <div class="meme-type-selector">
-                        <button type="button" class="meme-type-btn active" data-type="image" data-for="after">Image</button>
-                        <button type="button" class="meme-type-btn" data-type="video" data-for="after">Video</button>
+                    <h3>After-Answer Media (Shows after answering) <span class="optional-label">(Optional)</span></h3>
+                    <div class="media-type-selector">
+                        <button type="button" class="media-type-btn active" data-type="image" data-for="after">Image</button>
+                        <button type="button" class="media-type-btn" data-type="video" data-for="after">Video</button>
                     </div>
-                    <div class="meme-upload-section">
-                        <input type="file" id="admin-after-meme-upload" accept="image/*,video/*">
-                        <input type="text" id="admin-after-meme-url" placeholder="Or paste URL here">
-                        <img id="after-meme-preview" class="meme-preview" alt="Meme preview">
-                        <video id="after-video-preview" class="meme-preview" controls style="display:none"></video>
+                    <div class="media-upload-section">
+                        <input type="file" id="admin-after-media-upload" accept="image/*,video/*">
+                        <input type="text" id="admin-after-media-url" placeholder="Paste URL here (optional)">
+                        <img id="after-media-preview" class="media-preview" alt="Media preview">
+                        <video id="after-video-preview" class="media-preview" controls style="display:none"></video>
                     </div>
                 </div>
                 
@@ -829,7 +873,7 @@
 
     <script>
         // Use a key for localStorage
-        const STORAGE_KEY = 'memeQuizQuestions_CustomLevels';
+        const STORAGE_KEY = 'mediaQuizQuestions_CustomLevels';
         
         // Default empty questions with custom levels
         const defaultData = {
@@ -843,8 +887,10 @@
         const resultContainer = document.getElementById('result-container');
         const questionElement = document.getElementById('question');
         const optionsElement = document.getElementById('options');
-        const memeContainer = document.getElementById('meme-container');
-        const afterMemeContainer = document.getElementById('after-meme-container');
+        const mediaContainer = document.getElementById('media-container');
+        const afterMediaOverlay = document.getElementById('after-media-overlay');
+        const afterMediaContainer = document.getElementById('after-media-container');
+        const closeAfterMediaBtn = document.getElementById('close-after-media');
         const scoreElement = document.getElementById('score');
         const finalScoreElement = document.getElementById('final-score');
         const resultMessageElement = document.getElementById('result-message');
@@ -880,6 +926,7 @@
         let userAnswers = [];
         let quizData = {};
         let questionShuffleMap = {};
+        let activeMediaElements = [];
 
         // Initialize the quiz
         function initQuiz() {
@@ -916,6 +963,19 @@
                 errorModal.style.display = 'none';
             });
             
+            // After-answer media overlay
+            closeAfterMediaBtn.addEventListener('click', () => {
+                // Stop any playing media
+                stopAllMedia();
+                afterMediaOverlay.style.display = 'none';
+                if (currentQuestionIndex < currentQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                } else {
+                    finishQuiz();
+                }
+            });
+            
             // Export/import functionality
             exportBtn.addEventListener('click', exportQuizData);
             importBtn.addEventListener('click', () => importFile.click());
@@ -924,36 +984,36 @@
             // Level management
             addLevelBtn.addEventListener('click', addCustomLevel);
             
-            // Meme upload previews
-            setupMemeUpload('display');
-            setupMemeUpload('after');
+            // Media upload previews
+            setupMediaUpload('display');
+            setupMediaUpload('after');
             
-            // Meme type selector
-            document.querySelectorAll('.meme-type-btn').forEach(btn => {
+            // Media type selector
+            document.querySelectorAll('.media-type-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const type = this.getAttribute('data-type');
                     const forSection = this.getAttribute('data-for');
                     const container = this.parentElement;
                     
                     // Toggle active state
-                    container.querySelectorAll('.meme-type-btn').forEach(b => b.classList.remove('active'));
+                    container.querySelectorAll('.media-type-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     
                     // Update preview visibility
                     if (forSection === 'display') {
                         if (type === 'image') {
-                            document.getElementById('display-meme-preview').style.display = 'block';
+                            document.getElementById('display-media-preview').style.display = 'block';
                             document.getElementById('display-video-preview').style.display = 'none';
                         } else {
-                            document.getElementById('display-meme-preview').style.display = 'none';
+                            document.getElementById('display-media-preview').style.display = 'none';
                             document.getElementById('display-video-preview').style.display = 'block';
                         }
                     } else {
                         if (type === 'image') {
-                            document.getElementById('after-meme-preview').style.display = 'block';
+                            document.getElementById('after-media-preview').style.display = 'block';
                             document.getElementById('after-video-preview').style.display = 'none';
                         } else {
-                            document.getElementById('after-meme-preview').style.display = 'none';
+                            document.getElementById('after-media-preview').style.display = 'none';
                             document.getElementById('after-video-preview').style.display = 'block';
                         }
                     }
@@ -961,10 +1021,22 @@
             });
         }
 
+        // Function to stop all media elements
+        function stopAllMedia() {
+            // Stop all media elements
+            document.querySelectorAll('video').forEach(video => {
+                video.pause();
+                video.currentTime = 0;
+            });
+            
+            // Clear active media array
+            activeMediaElements = [];
+        }
+
         // Function to shuffle array (Fisher-Yates algorithm)
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() (i + 1));
+                const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
             return array;
@@ -1089,10 +1161,10 @@
             errorModal.style.display = 'flex';
         }
 
-        function setupMemeUpload(section) {
-            const uploadInput = document.getElementById(`admin-${section}-meme-upload`);
-            const urlInput = document.getElementById(`admin-${section}-meme-url`);
-            const imagePreview = document.getElementById(`${section}-meme-preview`);
+        function setupMediaUpload(section) {
+            const uploadInput = document.getElementById(`admin-${section}-media-upload`);
+            const urlInput = document.getElementById(`admin-${section}-media-url`);
+            const imagePreview = document.getElementById(`${section}-media-preview`);
             const videoPreview = document.getElementById(`${section}-video-preview`);
             
             uploadInput.addEventListener('change', function(e) {
@@ -1105,15 +1177,15 @@
                             imagePreview.style.display = 'block';
                             videoPreview.style.display = 'none';
                             // Set active button to image
-                            document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="image"]`).classList.add('active');
-                            document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="video"]`).classList.remove('active');
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.add('active');
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.remove('active');
                         } else if (file.type.startsWith('video/')) {
                             videoPreview.src = event.target.result;
                             videoPreview.style.display = 'block';
                             imagePreview.style.display = 'none';
                             // Set active button to video
-                            document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="video"]`).classList.add('active');
-                            document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="image"]`).classList.remove('active');
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.add('active');
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.remove('active');
                         }
                         urlInput.value = event.target.result;
                     };
@@ -1128,16 +1200,20 @@
                         videoPreview.style.display = 'block';
                         imagePreview.style.display = 'none';
                         // Set active button to video
-                        document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="video"]`).classList.add('active');
-                        document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="image"]`).classList.remove('active');
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.add('active');
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.remove('active');
                     } else {
                         imagePreview.src = this.value;
                         imagePreview.style.display = 'block';
                         videoPreview.style.display = 'none';
                         // Set active button to image
-                        document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="image"]`).classList.add('active');
-                        document.querySelector(`.meme-type-btn[data-for="${section}"][data-type="video"]`).classList.remove('active');
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.add('active');
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.remove('active');
                     }
+                } else {
+                    // If URL is empty, hide previews
+                    imagePreview.style.display = 'none';
+                    videoPreview.style.display = 'none';
                 }
             });
         }
@@ -1269,32 +1345,31 @@
             const question = currentQuestions[currentQuestionIndex];
             questionElement.textContent = question.question;
             
-            // Hide after-meme container
-            afterMemeContainer.style.display = 'none';
-            
             // Update progress bar
             progressElement.style.width = `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%`;
             
-            // Display meme
-            memeContainer.innerHTML = '';
-            if (question.displayMeme && question.displayMeme.url) {
-                if (question.displayMeme.type === 'image') {
+            // Display media
+            mediaContainer.innerHTML = '';
+            if (question.displayMedia && question.displayMedia.url) {
+                mediaContainer.classList.remove('hidden');
+                if (question.displayMedia.type === 'image') {
                     const img = document.createElement('img');
-                    img.src = question.displayMeme.url;
-                    img.alt = "Question meme";
-                    memeContainer.appendChild(img);
+                    img.src = question.displayMedia.url;
+                    img.alt = "Question media";
+                    mediaContainer.appendChild(img);
                 } else {
                     const video = document.createElement('video');
-                    video.src = question.displayMeme.url;
-                    video.alt = "Question meme";
+                    video.src = question.displayMedia.url;
+                    video.alt = "Question media";
                     video.autoplay = true;
                     video.loop = true;
                     video.muted = true;
                     video.controls = true;
-                    memeContainer.appendChild(video);
+                    mediaContainer.appendChild(video);
+                    activeMediaElements.push(video);
                 }
             } else {
-                memeContainer.innerHTML = '<p>No meme available</p>';
+                mediaContainer.classList.add('hidden');
             }
             
             // Display options in shuffled order
@@ -1357,34 +1432,45 @@
                 options[correctIndex].classList.add('correct');
             }
             
-            // Show after-answer meme
-            afterMemeContainer.innerHTML = '';
+            // Stop any playing media in the question
+            stopAllMedia();
+            
+            // Show after-answer media in fullscreen overlay
+            afterMediaContainer.innerHTML = '';
             const question = currentQuestions[currentQuestionIndex];
-            if (question.afterMeme && question.afterMeme.url) {
-                if (question.afterMeme.type === 'image') {
+            if (question.afterMedia && question.afterMedia.url) {
+                if (question.afterMedia.type === 'image') {
                     const img = document.createElement('img');
-                    img.src = question.afterMeme.url;
-                    img.alt = "Answer meme";
-                    afterMemeContainer.appendChild(img);
+                    img.src = question.afterMedia.url;
+                    img.alt = "Answer media";
+                    afterMediaContainer.appendChild(img);
                 } else {
                     const video = document.createElement('video');
-                    video.src = question.afterMeme.url;
-                    video.alt = "Answer meme";
+                    video.src = question.afterMedia.url;
+                    video.alt = "Answer media";
                     video.autoplay = true;
                     video.loop = true;
                     video.muted = true;
                     video.controls = true;
-                    afterMemeContainer.appendChild(video);
+                    afterMediaContainer.appendChild(video);
+                    activeMediaElements.push(video);
                 }
-                afterMemeContainer.style.display = 'flex';
+                afterMediaOverlay.style.display = 'flex';
+            } else {
+                // If no after-answer media, proceed automatically
+                if (currentQuestionIndex < currentQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                } else {
+                    finishQuiz();
+                }
             }
-            
-            // Enable next button
-            nextButton.disabled = false;
         }
 
         prevButton.addEventListener('click', () => {
             if (currentQuestionIndex > 0) {
+                // Stop any playing media
+                stopAllMedia();
                 currentQuestionIndex--;
                 showQuestion();
             }
@@ -1395,6 +1481,9 @@
                 showModal("Please select an answer before proceeding!");
                 return;
             }
+            
+            // Stop any playing media
+            stopAllMedia();
             
             if (currentQuestionIndex < currentQuestions.length - 1) {
                 currentQuestionIndex++;
@@ -1415,9 +1504,9 @@
             let message;
             
             if (percentage === 1) {
-                message = "Perfect! You're a meme master!";
+                message = "Perfect! You're a quiz master!";
             } else if (percentage >= 0.8) {
-                message = "Great job! You know your memes!";
+                message = "Great job! You know your stuff!";
             } else if (percentage >= 0.6) {
                 message = "Good effort! Keep practicing!";
             } else if (percentage >= 0.4) {
@@ -1444,22 +1533,22 @@
             document.getElementById('admin-option3').value = '';
             document.getElementById('admin-option4').value = '';
             
-            // Reset meme URLs
-            document.getElementById('admin-display-meme-url').value = '';
-            document.getElementById('admin-after-meme-url').value = '';
+            // Reset media URLs
+            document.getElementById('admin-display-media-url').value = '';
+            document.getElementById('admin-after-media-url').value = '';
             
             // Reset file inputs
-            document.getElementById('admin-display-meme-upload').value = '';
-            document.getElementById('admin-after-meme-upload').value = '';
+            document.getElementById('admin-display-media-upload').value = '';
+            document.getElementById('admin-after-media-upload').value = '';
             
             // Reset previews
-            document.getElementById('display-meme-preview').style.display = 'none';
+            document.getElementById('display-media-preview').style.display = 'none';
             document.getElementById('display-video-preview').style.display = 'none';
-            document.getElementById('after-meme-preview').style.display = 'none';
+            document.getElementById('after-media-preview').style.display = 'none';
             document.getElementById('after-video-preview').style.display = 'none';
             
-            // Reset meme type buttons to image
-            document.querySelectorAll('.meme-type-btn').forEach(btn => {
+            // Reset media type buttons to image
+            document.querySelectorAll('.media-type-btn').forEach(btn => {
                 if (btn.getAttribute('data-type') === 'image') {
                     btn.classList.add('active');
                 } else {
@@ -1476,13 +1565,13 @@
             const option3 = document.getElementById('admin-option3').value;
             const option4 = document.getElementById('admin-option4').value;
             
-            // Get display meme type and URL
-            const displayMemeType = document.querySelector('.meme-type-btn[data-for="display"].active').getAttribute('data-type');
-            const displayMemeUrl = document.getElementById('admin-display-meme-url').value;
+            // Get display media type and URL
+            const displayMediaType = document.querySelector('.media-type-btn[data-for="display"].active').getAttribute('data-type');
+            const displayMediaUrl = document.getElementById('admin-display-media-url').value;
             
-            // Get after-answer meme type and URL
-            const afterMemeType = document.querySelector('.meme-type-btn[data-for="after"].active').getAttribute('data-type');
-            const afterMemeUrl = document.getElementById('admin-after-meme-url').value;
+            // Get after-answer media type and URL
+            const afterMediaType = document.querySelector('.media-type-btn[data-for="after"].active').getAttribute('data-type');
+            const afterMediaUrl = document.getElementById('admin-after-media-url').value;
 
             // Validate inputs
             if (!levelId) {
@@ -1490,8 +1579,8 @@
                 return;
             }
             
-            if (!questionText || !option1 || !option2 || !option3 || !option4 || !displayMemeUrl || !afterMemeUrl) {
-                showModal("Please fill in all fields!");
+            if (!questionText || !option1 || !option2 || !option3 || !option4) {
+                showModal("Please fill in all question and answer fields!");
                 return;
             }
 
@@ -1500,14 +1589,14 @@
                 question: questionText,
                 options: [option1, option2, option3, option4],
                 correct: 0,
-                displayMeme: {
-                    type: displayMemeType,
-                    url: displayMemeUrl
-                },
-                afterMeme: {
-                    type: afterMemeType,
-                    url: afterMemeUrl
-                }
+                displayMedia: displayMediaUrl ? {
+                    type: displayMediaType,
+                    url: displayMediaUrl
+                } : null,
+                afterMedia: afterMediaUrl ? {
+                    type: afterMediaType,
+                    url: afterMediaUrl
+                } : null
             };
 
             // Add to questions
@@ -1571,7 +1660,7 @@
             const dataStr = JSON.stringify(quizData);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            const exportFileDefaultName = 'meme-quiz-data.json';
+            const exportFileDefaultName = 'media-quiz-data.json';
             
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
