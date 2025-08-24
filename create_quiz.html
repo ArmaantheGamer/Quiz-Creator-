@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Quiz - My Life, My Quiz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styles for the create quiz page */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(to bottom, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(to bottom, #2575fc, #6a11cb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .admin-panel {
+            display: block;
+            margin-top: 20px;
+        }
+        
+        .quiz-name-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f1faee;
+            border-radius: 15px;
+        }
+        
+        .level-order-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .order-btn {
+            padding: 8px 12px;
+            background: #118ab2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .current-quiz-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #073b4c;
+            margin-bottom: 15px;
+        }
+        
+        /* Question editor styles */
+        .questions-list {
+            margin-top: 30px;
+            border-top: 2px solid #a8dadc;
+            padding-top: 20px;
+        }
+        
+        .question-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #118ab2;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .question-options {
+            margin-left: 20px;
+        }
+        
+        .question-option {
+            margin-bottom: 5px;
+        }
+        
+        .correct-option {
+            color: #06d6a0;
+            font-weight: bold;
+        }
+        
+        .question-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .edit-question-btn {
+            padding: 8px 12px;
+            background: #118ab2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .delete-question-btn {
+            padding: 8px 12px;
+            background: #ef476f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        /* Fix for level order display */
+        .level-item > div:first-child {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .level-order {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+        
+        <h1>Create Your Quiz</h1>
+        <p>Add your own questions and media to create a custom quiz experience!</p>
+        
+        <div class="quiz-name-section">
+            <h2>Quiz Information</h2>
+            <div class="form-group">
+                <label for="quiz-name">Quiz Name</label>
+                <input type="text" id="quiz-name" placeholder="Enter quiz name">
+            </div>
+            <button class="admin-btn" id="save-quiz-name-btn"><i class="fas fa-save"></i> Save Quiz Name</button>
+            
+            <div id="current-quiz-info" style="display: none; margin-top: 20px;">
+                <div class="current-quiz-name" id="current-quiz-name"></div>
+                <div class="form-group">
+                    <label>Quiz ID: <span id="current-quiz-id"></span></label>
+                </div>
+            </div>
+        </div>
+        
+        <div id="admin-panel" class="admin-panel">
+            <h2>Quiz Creator Panel</h2>
+            <p>Add your own questions and media to the quiz! (Changes are saved to your browser's storage)</p>
+            
+            <div class="level-manager">
+                <h3>Level Manager</h3>
+                <p>Create levels for your quiz and set their order</p>
+                
+                <div class="level-form">
+                    <div class="form-group">
+                        <label for="level-name">Level Name</label>
+                        <input type="text" id="level-name" placeholder="Enter level name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="level-color1">Color 1</label>
+                        <input type="color" id="level-color1" value="#ffd166">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="level-color2">Color 2</label>
+                        <input type="color" id="level-color2" value="#ffb700">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="admin-btn" id="add-level-btn"><i class="fas fa-plus"></i> Add Level</button>
+                    </div>
+                </div>
+                
+                <div class="level-list" id="level-list">
+                    <!-- Levels will be listed here -->
+                </div>
+            </div>
+            
+            <div class="admin-form">
+                <div class="form-group full-width">
+                    <label for="admin-difficulty">Level</label>
+                    <select id="admin-difficulty">
+                        <!-- Levels will be populated here -->
+                    </select>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="admin-question">Question</label>
+                    <input type="text" id="admin-question" placeholder="Enter your question here">
+                </div>
+                
+                <div class="form-group">
+                    <label for="admin-option1">Correct Answer</label>
+                    <input type="text" id="admin-option1" placeholder="Correct answer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="admin-option2">Option 2</label>
+                    <input type="text" id="admin-option2" placeholder="Incorrect answer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="admin-option3">Option 3</label>
+                    <input type="text" id="admin-option3" placeholder="Incorrect answer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="admin-option4">Option 4</label>
+                    <input type="text" id="admin-option4" placeholder="Incorrect answer">
+                </div>
+                
+                <div class="form-group full-width">
+                    <h3>Display Media (Shows with question) <span class="optional-label">(Optional)</span></h3>
+                    <div class="media-type-selector">
+                        <button type="button" class="media-type-btn active" data-type="image" data-for="display">Image</button>
+                        <button type="button" class="media-type-btn" data-type="video" data-for="display">Video</button>
+                    </div>
+                    <div class="media-upload-section">
+                        <input type="file" id="admin-display-media-upload" accept="image/*,video/*">
+                        <input type="text" id="admin-display-media-url" placeholder="Paste URL here (optional)">
+                        <img id="display-media-preview" class="media-preview" alt="Media preview">
+                        <video id="display-video-preview" class="media-preview" controls style="display:none"></video>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <h3>After-Answer Media (Shows after answering) <span class="optional-label">(Optional)</span></h3>
+                    <div class="media-type-selector">
+                        <button type="button" class="media-type-btn active" data-type="image" data-for="after">Image</button>
+                        <button type="button" class="media-type-btn" data-type="video" data-for="after">Video</button>
+                    </div>
+                    <div class="media-upload-section">
+                        <input type="file" id="admin-after-media-upload" accept="image/*,video/*">
+                        <input type="text" id="admin-after-media-url" placeholder="Paste URL here (optional)">
+                        <img id="after-media-preview" class="media-preview" alt="Media preview">
+                        <video id="after-video-preview" class="media-preview" controls style="display:none"></video>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <button class="admin-btn" id="add-question-btn"><i class="fas fa-plus"></i> Add Question</button>
+                    <button class="admin-btn" id="view-questions-btn" style="background: #06d6a0;"><i class="fas fa-eye"></i> View Questions</button>
+                    <button class="admin-btn" id="reset-questions-btn" style="background: #ef476f;"><i class="fas fa-trash"></i> Reset All</button>
+                </div>
+            </div>
+            
+            <div class="questions-list" id="questions-list">
+                <!-- Questions will be listed here -->
+            </div>
+        </div>
+        
+        <!-- Credits section -->
+        <div class="credits">
+            <p>Created by <strong>naamra</strong> - A student of X-E (CRPF Public School)</p>
+        </div>
+    </div>
+
+    <!-- Modal for error messages -->
+    <div class="modal" id="error-modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-exclamation-circle"></i> Oops!</h2>
+            <p id="modal-message">Please create some questions first.</p>
+            <button class="modal-btn" id="modal-ok-btn">OK</button>
+        </div>
+    </div>
+
+    <!-- Question editor modal -->
+    <div class="modal" id="question-editor-modal">
+        <div class="modal-content">
+            <h2>Edit Question</h2>
+            <div class="admin-form">
+                <div class="form-group full-width">
+                    <label for="edit-question">Question</label>
+                    <input type="text" id="edit-question" placeholder="Enter your question here">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-option1">Correct Answer</label>
+                    <input type="text" id="edit-option1" placeholder="Correct answer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-option2">Option 2</label>
+                    <input type="text" id="edit-option2" placeholder="Incorrect answer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-option3">Option 3</label>
+                    <input type="text" id="edit-option3" placeholder="Incorrect answer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-option4">Option 4</label>
+                    <input type="text" id="edit-option4" placeholder="Incorrect answer">
+                </div>
+                
+                <div class="form-group full-width">
+                    <h3>Display Media (Shows with question) <span class="optional-label">(Optional)</span></h3>
+                    <div class="media-type-selector">
+                        <button type="button" class="media-type-btn active" data-type="image" data-for="edit-display">Image</button>
+                        <button type="button" class="media-type-btn" data-type="video" data-for="edit-display">Video</button>
+                    </div>
+                    <div class="media-upload-section">
+                        <input type="file" id="edit-display-media-upload" accept="image/*,video/*">
+                        <input type="text" id="edit-display-media-url" placeholder="Paste URL here (optional)">
+                        <img id="edit-display-media-preview" class="media-preview" alt="Media preview">
+                        <video id="edit-display-video-preview" class="media-preview" controls style="display:none"></video>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <h3>After-Answer Media (Shows after answering) <span class="optional-label">(Optional)</span></h3>
+                    <div class="media-type-selector">
+                        <button type="button" class="media-type-btn active" data-type="image" data-for="edit-after">Image</button>
+                        <button type="button" class="media-type-btn" data-type="video" data-for="edit-after">Video</button>
+                    </div>
+                    <div class="media-upload-section">
+                        <input type="file" id="edit-after-media-upload" accept="image/*,video/*">
+                        <input type="text" id="edit-after-media-url" placeholder="Paste URL here (optional)">
+                        <img id="edit-after-media-preview" class="media-preview" alt="Media preview">
+                        <video id="edit-after-video-preview" class="media-preview" controls style="display:none"></video>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button class="modal-btn" id="edit-question-cancel-btn">Cancel</button>
+                <button class="modal-btn" id="edit-question-save-btn" style="background: #06d6a0;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
