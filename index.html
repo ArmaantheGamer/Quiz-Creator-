@@ -3,301 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Life, My Quiz</title>
+    <title>Create Quiz - My Life, My Quiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Additional style for the new button */
-        .create-quiz-btn-container {
-            margin: 30px 0;
+        .quiz-creator {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .creator-header {
             text-align: center;
+            margin-bottom: 30px;
         }
-
-        .create-quiz-btn {
-            padding: 24px 40px;
-            background: linear-gradient(to bottom, #ff6b6b, #ff4757);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            /* 10% bigger than original buttons */
-            transform: scale(1.1);
+        
+        .creator-header h1 {
+            color: #ff6b6b;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 #ffd166;
         }
-
-        .create-quiz-btn:hover {
-            background: linear-gradient(to bottom, #ff4757, #ff2e4d);
-            transform: scale(1.15);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        
+        .creator-header p {
+            font-size: 1.2rem;
+            color: #6c757d;
         }
-
-        /* Quiz selection styles */
-        .quiz-item {
-            padding: 25px 30px;
+        
+        .back-to-quizzes {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
             background: linear-gradient(to bottom, #6a11cb, #2575fc);
             color: white;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            position: relative;
-        }
-
-        .quiz-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .quiz-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .quiz-levels {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .play-in-order-btn {
-            margin-top: 15px;
-            padding: 12px 25px;
-            background: linear-gradient(to bottom, #06d6a0, #04a57a);
-            color: white;
-            border: none;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
+            text-decoration: none;
             font-weight: bold;
-            transition: all 0.3s ease;
         }
-
-        .play-in-order-btn:hover {
-            background: linear-gradient(to bottom, #04a57a, #038c65);
-            transform: scale(1.05);
-        }
-
-        /* Quiz details modal */
-        .quiz-details-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .quiz-details-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .level-list-item {
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Quiz settings dropdown */
-        .quiz-settings {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-        }
-
-        .settings-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: white;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-
-        .settings-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-
-        .settings-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
+        
+        .quiz-form {
             background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .form-section h3 {
+            color: #118ab2;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #a8dadc;
+        }
+        
+        .questions-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            width: 180px;
-            z-index: 100;
-            display: none;
-            overflow: hidden;
         }
-
-        .settings-dropdown.show {
-            display: block;
-        }
-
-        .settings-option {
-            padding: 12px 15px;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .settings-option:hover {
-            background: #f0f0f0;
-        }
-
-        .settings-option i {
-            width: 20px;
+        
+        .empty-state {
             text-align: center;
+            padding: 30px;
+            color: #6c757d;
         }
-
-        .delete-option {
-            color: #e74c3c;
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ced4da;
         }
-
-        /* Center import button */
-        .data-actions {
+        
+        .form-actions {
             display: flex;
+            gap: 15px;
             justify-content: center;
-            margin: 20px 0;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="start-screen">
-            <h1>My Life, My Quiz</h1>
-            <h2>Select a Quiz to Play!</h2>
-            <p>Choose from your created quizzes or create a new one!</p>
+        <div class="quiz-creator">
+            <a href="index.html" class="back-to-quizzes">
+                <i class="fas fa-arrow-left"></i> Back to Quizzes
+            </a>
             
-            <div class="instructions">
-                <h3>How to use:</h3>
-                <ul>
-                    <li>Click the "Create Your Quiz" button to create a new quiz with levels</li>
-                    <li>Import quiz data to load quizzes created by others</li>
-                    <li>Select a quiz to view its levels and play in order</li>
-                </ul>
+            <div class="creator-header">
+                <h1>Create Your Quiz</h1>
+                <p>Design your custom quiz with multiple levels and media-rich questions</p>
             </div>
             
-            <div class="data-actions">
-                <button class="data-btn" id="import-btn">
-                    <i class="fas fa-file-import"></i> Import Quiz Data
-                </button>
-                <input type="file" id="import-file" accept=".json" style="display: none;">
-            </div>
-            
-            <!-- New Create Quiz Button -->
-            <div class="create-quiz-btn-container">
-                <a href="create_quiz.html" class="create-quiz-btn">
-                    <i class="fas fa-plus-circle"></i> Create Your Quiz
-                </a>
-            </div>
-            
-            <div id="quizzes-container" class="difficulty-select">
-                <!-- Quizzes will be displayed here -->
-            </div>
-            
-            <p class="funny-message" id="start-message">No quizzes yet! Click 'Create Your Quiz' to create your first quiz.</p>
-        </div>
-        
-        <div id="quiz-container" class="quiz-container">
-            <div class="level-indicator" id="level-indicator"></div>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
-            </div>
-            <div class="question" id="question"></div>
-            
-            <div class="media-container hidden" id="media-container">
-                <!-- Display media will be inserted here -->
-            </div>
-            
-            <div class="options" id="options"></div>
-            
-            <div class="navigation">
-                <button class="nav-btn" id="prev-btn" disabled><i class="fas fa-arrow-left"></i> Previous</button>
-                <div class="score-display"><i class="fas fa-star"></i> Score: <span id="score">0</span></div>
-                <button class="nav-btn" id="next-btn">Next <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-        
-        <div id="result-container" class="result-container">
-            <h2 class="result-title">Quiz Completed!</h2>
-            <div class="final-score" id="final-score">0</div>
-            <p class="result-message" id="result-message"></p>
-            <button class="play-again" id="play-again"><i class="fas fa-redo"></i> Play Again</button>
-        </div>
-        
-        <!-- After-answer media overlay -->
-        <div class="after-media-overlay" id="after-media-overlay">
-            <div class="after-media-container" id="after-media-container">
-                <!-- After-answer media will be inserted here -->
-            </div>
-            <button class="close-after-media" id="close-after-media">Continue</button>
-        </div>
-
-        <!-- Quiz details modal -->
-        <div class="quiz-details-modal" id="quiz-details-modal">
-            <div class="quiz-details-content">
-                <h2 id="modal-quiz-title">Quiz Title</h2>
-                <div id="modal-levels-list">
-                    <!-- Levels will be listed here -->
+            <div class="quiz-form">
+                <div class="form-section">
+                    <h3>Quiz Information</h3>
+                    <div class="form-group">
+                        <label for="quiz-name">Quiz Name</label>
+                        <input type="text" id="quiz-name" placeholder="Enter a name for your quiz">
+                    </div>
+                    <button id="save-quiz-name-btn" class="admin-btn">
+                        <i class="fas fa-save"></i> Save Quiz Name
+                    </button>
                 </div>
-                <button class="play-in-order-btn" id="play-in-order-btn">Play in Order</button>
-                <button class="nav-btn" id="close-quiz-modal" style="margin-top: 15px;">Close</button>
-            </div>
-        </div>
-        
-        <!-- Quiz rename modal -->
-        <div class="modal" id="rename-modal">
-            <div class="modal-content">
-                <h2>Rename Quiz</h2>
-                <div class="form-group">
-                    <label for="rename-input">New Quiz Name</label>
-                    <input type="text" id="rename-input" placeholder="Enter new quiz name">
+                
+                <div class="form-section">
+                    <h3>Level Management</h3>
+                    <div class="level-form">
+                        <div class="form-group">
+                            <label for="level-name">Level Name</label>
+                            <input type="text" id="level-name" placeholder="Enter level name">
+                        </div>
+                        <div class="form-group">
+                            <label for="level-color1">Color 1</label>
+                            <input type="color" id="level-color1" value="#6a11cb">
+                        </div>
+                        <div class="form-group">
+                            <label for="level-color2">Color 2</label>
+                            <input type="color" id="level-color2" value="#2575fc">
+                        </div>
+                        <button id="add-level-btn" class="admin-btn">
+                            <i class="fas fa-plus"></i> Add Level
+                        </button>
+                    </div>
+                    
+                    <div id="level-list" class="level-list">
+                        <!-- Levels will be added here -->
+                    </div>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                    <button class="modal-btn" id="rename-cancel-btn">Cancel</button>
-                    <button class="modal-btn" id="rename-save-btn" style="background: #06d6a0;">Save</button>
+                
+                <div class="form-section">
+                    <h3>Add Questions</h3>
+                    <div class="admin-form">
+                        <div class="form-group full-width">
+                            <label for="admin-difficulty">Select Level</label>
+                            <select id="admin-difficulty">
+                                <option value="">Select a level first</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="admin-question">Question</label>
+                            <textarea id="admin-question" placeholder="Enter your question"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option1">Option 1 (Correct Answer)</label>
+                            <input type="text" id="admin-option1" placeholder="Correct answer">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option2">Option 2</label>
+                            <input type="text" id="admin-option2" placeholder="Option 2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option3">Option 3</label>
+                            <input type="text" id="admin-option3" placeholder="Option 3">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option4">Option 4</label>
+                            <input type="text" id="admin-option4" placeholder="Option 4">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>Display Media (Optional)</label>
+                            <div class="media-upload-section">
+                                <div class="media-type-selector">
+                                    <button class="media-type-btn active" data-type="image" data-for="display">
+                                        <i class="fas fa-image"></i> Image
+                                    </button>
+                                    <button class="media-type-btn" data-type="video" data-for="display">
+                                        <i class="fas fa-video"></i> Video
+                                    </button>
+                                </div>
+                                <input type="file" id="display-media-upload" accept="image/*,video/*" style="display: none;">
+                                <button type="button" class="data-btn" id="display-media-upload-btn" style="margin-bottom: 10px;">
+                                    <i class="fas fa-upload"></i> Upload Media
+                                </button>
+                                <input type="text" id="display-media-url" placeholder="Or enter media URL">
+                                <img id="display-media-preview" class="media-preview">
+                                <video id="display-video-preview" class="media-preview" controls style="display: none;"></video>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>After-Answer Media (Optional)</label>
+                            <div class="media-upload-section">
+                                <div class="media-type-selector">
+                                    <button class="media-type-btn active" data-type="image" data-for="after">
+                                        <i class="fas fa-image"></i> Image
+                                    </button>
+                                    <button class="media-type-btn" data-type="video" data-for="after">
+                                        <i class="fas fa-video"></i> Video
+                                    </button>
+                                </div>
+                                <input type="file" id="after-media-upload" accept="image/*,video/*" style="display: none;">
+                                <button type="button" class="data-btn" id="after-media-upload-btn" style="margin-bottom: 10px;">
+                                    <i class="fas fa-upload"></i> Upload Media
+                                </button>
+                                <input type="text" id="after-media-url" placeholder="Or enter media URL">
+                                <img id="after-media-preview" class="media-preview">
+                                <video id="after-video-preview" class="media-preview" controls style="display: none;"></video>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <button id="add-question-btn" class="admin-btn">
+                                <i class="fas fa-plus-circle"></i> Add Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Current Questions</h3>
+                    <div id="questions-list" class="questions-list">
+                        <div class="empty-state">
+                            <i class="fas fa-question-circle"></i>
+                            <p>No questions added yet. Add questions using the form above.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button id="save-quiz-btn" class="admin-btn" style="background: linear-gradient(to bottom, #06d6a0, #04a57a);">
+                        <i class="fas fa-save"></i> Save Quiz
+                    </button>
+                    <button id="reset-questions-btn" class="admin-btn" style="background: linear-gradient(to bottom, #ef476f, #d90429);">
+                        <i class="fas fa-trash"></i> Reset All
+                    </button>
                 </div>
             </div>
-        </div>
-        
-        <!-- Credits section -->
-        <div class="credits">
-            <p>Created by <strong>naamra</strong> - A student of X-E (CRPF Public School)</p>
         </div>
     </div>
 
@@ -320,344 +264,326 @@
         };
 
         // DOM elements
-        const startScreen = document.getElementById('start-screen');
-        const quizContainer = document.getElementById('quiz-container');
-        const resultContainer = document.getElementById('result-container');
-        const questionElement = document.getElementById('question');
-        const optionsElement = document.getElementById('options');
-        const mediaContainer = document.getElementById('media-container');
-        const afterMediaOverlay = document.getElementById('after-media-overlay');
-        const afterMediaContainer = document.getElementById('after-media-container');
-        const closeAfterMediaBtn = document.getElementById('close-after-media');
-        const scoreElement = document.getElementById('score');
-        const finalScoreElement = document.getElementById('final-score');
-        const resultMessageElement = document.getElementById('result-message');
-        const progressElement = document.getElementById('progress');
-        const prevButton = document.getElementById('prev-btn');
-        const nextButton = document.getElementById('next-btn');
-        const playAgainButton = document.getElementById('play-again');
-        const startMessage = document.getElementById('start-message');
-        const importBtn = document.getElementById('import-btn');
-        const importFile = document.getElementById('import-file');
-        const quizzesContainer = document.getElementById('quizzes-container');
+        const quizNameInput = document.getElementById('quiz-name');
+        const saveQuizNameBtn = document.getElementById('save-quiz-name-btn');
+        const saveQuizBtn = document.getElementById('save-quiz-btn');
+        const levelSelect = document.getElementById('admin-difficulty');
+        const levelNameInput = document.getElementById('level-name');
+        const levelColor1Input = document.getElementById('level-color1');
+        const levelColor2Input = document.getElementById('level-color2');
+        const addLevelBtn = document.getElementById('add-level-btn');
+        const levelList = document.getElementById('level-list');
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const resetQuestionsBtn = document.getElementById('reset-questions-btn');
+        const questionsList = document.getElementById('questions-list');
         const errorModal = document.getElementById('error-modal');
         const modalMessage = document.getElementById('modal-message');
         const modalOkBtn = document.getElementById('modal-ok-btn');
-        const quizDetailsModal = document.getElementById('quiz-details-modal');
-        const modalQuizTitle = document.getElementById('modal-quiz-title');
-        const modalLevelsList = document.getElementById('modal-levels-list');
-        const playInOrderBtn = document.getElementById('play-in-order-btn');
-        const closeQuizModal = document.getElementById('close-quiz-modal');
-        const renameModal = document.getElementById('rename-modal');
-        const renameInput = document.getElementById('rename-input');
-        const renameCancelBtn = document.getElementById('rename-cancel-btn');
-        const renameSaveBtn = document.getElementById('rename-save-btn');
+        const displayMediaUploadBtn = document.getElementById('display-media-upload-btn');
+        const displayMediaUpload = document.getElementById('display-media-upload');
+        const afterMediaUploadBtn = document.getElementById('after-media-upload-btn');
+        const afterMediaUpload = document.getElementById('after-media-upload');
 
-        // Quiz state
-        let currentQuizId = '';
-        let currentLevelId = '';
-        let currentQuestions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let userAnswers = [];
+        // Quiz data
         let quizData = {};
-        let questionShuffleMap = {};
-        let activeMediaElements = [];
-        let selectedQuizId = '';
-        let quizToRename = null;
+        let currentQuiz = null;
 
-        // Initialize the quiz
-        function initQuiz() {
+        // Initialize the admin panel
+        function initAdmin() {
             // Load quizzes from localStorage or use defaults
             const savedData = localStorage.getItem(STORAGE_KEY);
             if (savedData) {
-                quizData = JSON.parse(savedData);
+                try {
+                    quizData = JSON.parse(savedData);
+                } catch (e) {
+                    console.error("Error parsing saved data:", e);
+                    quizData = JSON.parse(JSON.stringify(defaultData));
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+                }
             } else {
                 quizData = JSON.parse(JSON.stringify(defaultData));
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
             }
 
-            // Update UI based on quizzes
-            updateQuizzesDisplay();
-            updateStartMessage();
+            // Check if we're editing an existing quiz
+            const urlParams = new URLSearchParams(window.location.search);
+            const quizId = urlParams.get('quizId');
+            
+            if (quizId) {
+                const quiz = quizData.quizzes.find(q => q.id === quizId);
+                if (quiz) {
+                    currentQuiz = quiz;
+                    quizNameInput.value = quiz.name;
+                    updateLevelSelect();
+                    updateLevelList();
+                    updateQuestionsList();
+                }
+            }
 
             // Event listeners
+            saveQuizNameBtn.addEventListener('click', saveQuizName);
+            saveQuizBtn.addEventListener('click', saveQuiz);
+            addQuestionBtn.addEventListener('click', addCustomQuestion);
+            resetQuestionsBtn.addEventListener('click', resetQuestions);
             modalOkBtn.addEventListener('click', () => {
                 errorModal.style.display = 'none';
             });
             
-            // After-answer media overlay
-            closeAfterMediaBtn.addEventListener('click', () => {
-                // Stop any playing media
-                stopAllMedia();
-                afterMediaOverlay.style.display = 'none';
-                if (currentQuestionIndex < currentQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    showQuestion();
-                } else {
-                    finishQuiz();
-                }
-            });
+            // Level management
+            addLevelBtn.addEventListener('click', addCustomLevel);
             
-            // Import functionality
-            importBtn.addEventListener('click', () => importFile.click());
-            importFile.addEventListener('change', importQuizData);
+            // Media upload buttons
+            displayMediaUploadBtn.addEventListener('click', () => displayMediaUpload.click());
+            afterMediaUploadBtn.addEventListener('click', () => afterMediaUpload.click());
             
-            // Quiz details modal
-            playInOrderBtn.addEventListener('click', () => {
-                currentQuizId = selectedQuizId;
-                currentLevelId = 'order';
-                startQuiz();
-            });
+            // Media upload previews
+            setupMediaUpload('display');
+            setupMediaUpload('after');
             
-            closeQuizModal.addEventListener('click', () => {
-                quizDetailsModal.style.display = 'none';
-            });
-            
-            // Rename modal
-            renameCancelBtn.addEventListener('click', () => {
-                renameModal.style.display = 'none';
-            });
-            
-            renameSaveBtn.addEventListener('click', () => {
-                if (quizToRename) {
-                    const newName = renameInput.value.trim();
-                    if (newName) {
-                        renameQuiz(quizToRename, newName);
-                        renameModal.style.display = 'none';
+            // Media type selector
+            document.querySelectorAll('.media-type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    const forSection = this.getAttribute('data-for');
+                    const container = this.parentElement;
+                    
+                    // Toggle active state
+                    container.querySelectorAll('.media-type-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update preview visibility
+                    if (forSection === 'display') {
+                        if (type === 'image') {
+                            document.getElementById('display-media-preview').style.display = 'block';
+                            document.getElementById('display-video-preview').style.display = 'none';
+                        } else {
+                            document.getElementById('display-media-preview').style.display = 'none';
+                            document.getElementById('display-video-preview').style.display = 'block';
+                        }
+                    } else {
+                        if (type === 'image') {
+                            document.getElementById('after-media-preview').style.display = 'block';
+                            document.getElementById('after-video-preview').style.display = 'none';
+                        } else {
+                            document.getElementById('after-media-preview').style.display = 'none';
+                            document.getElementById('after-video-preview').style.display = 'block';
+                        }
                     }
-                }
+                });
             });
         }
 
-        // Function to stop all media elements
-        function stopAllMedia() {
-            // Stop all media elements
-            document.querySelectorAll('video').forEach(video => {
-                video.pause();
-                video.currentTime = 0;
-            });
+        function saveQuizName() {
+            const name = quizNameInput.value.trim();
             
-            // Clear active media array
-            activeMediaElements = [];
-        }
-
-        // Function to shuffle array (Fisher-Yates algorithm)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function updateQuizzesDisplay() {
-            quizzesContainer.innerHTML = '';
-            
-            // Filter out quizzes with no levels or no questions
-            const validQuizzes = quizData.quizzes.filter(quiz => {
-                if (!quiz.levels || quiz.levels.length === 0) return false;
-                
-                // Check if any level has questions
-                let hasQuestions = false;
-                for (const level of quiz.levels) {
-                    if (quiz.questions[level.id] && quiz.questions[level.id].length > 0) {
-                        hasQuestions = true;
-                        break;
-                    }
-                }
-                return hasQuestions;
-            });
-            
-            if (validQuizzes.length === 0) {
-                quizzesContainer.innerHTML = '<p>No quizzes available. Create a quiz to get started!</p>';
+            if (!name) {
+                showModal("Please enter a quiz name!");
                 return;
             }
             
-            validQuizzes.forEach(quiz => {
-                const quizElement = document.createElement('div');
-                quizElement.classList.add('quiz-item');
-                quizElement.setAttribute('data-quiz', quiz.id);
-                
-                // Count total questions
-                let totalQuestions = 0;
-                for (const level of quiz.levels) {
-                    if (quiz.questions[level.id]) {
-                        totalQuestions += quiz.questions[level.id].length;
-                    }
-                }
-                
-                quizElement.innerHTML = `
-                    <div class="quiz-title">${quiz.name}</div>
-                    <div class="quiz-levels">${quiz.levels.length} levels, ${totalQuestions} questions</div>
-                    <div class="quiz-settings">
-                        <button class="settings-btn">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <div class="settings-dropdown">
-                            <div class="settings-option" data-action="rename" data-quiz="${quiz.id}">
-                                <i class="fas fa-edit"></i> Rename
-                            </div>
-                            <div class="settings-option" data-action="edit" data-quiz="${quiz.id}">
-                                <i class="fas fa-cog"></i> Edit
-                            </div>
-                            <div class="settings-option" data-action="export" data-quiz="${quiz.id}">
-                                <i class="fas fa-file-export"></i> Export
-                            </div>
-                            <div class="settings-option delete-option" data-action="delete" data-quiz="${quiz.id}">
-                                <i class="fas fa-trash"></i> Delete
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Quiz click event
-                quizElement.addEventListener('click', (e) => {
-                    if (!e.target.closest('.quiz-settings')) {
-                        selectedQuizId = quiz.id;
-                        showQuizDetails(quiz);
-                    }
-                });
-                
-                // Settings dropdown events
-                const settingsBtn = quizElement.querySelector('.settings-btn');
-                const dropdown = quizElement.querySelector('.settings-dropdown');
-                
-                settingsBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    dropdown.classList.toggle('show');
-                });
-                
-                // Close dropdown when clicking elsewhere
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('.quiz-settings')) {
-                        dropdown.classList.remove('show');
-                    }
-                });
-                
-                // Dropdown option events
-                dropdown.querySelectorAll('.settings-option').forEach(option => {
-                    option.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const action = option.getAttribute('data-action');
-                        const quizId = option.getAttribute('data-quiz');
-                        handleQuizAction(action, quizId);
-                        dropdown.classList.remove('show');
-                    });
-                });
-                
-                quizzesContainer.appendChild(quizElement);
+            // Create a simple ID for the quiz
+            const id = name.toLowerCase().replace(/\s+/g, '-');
+            
+            // Check if quiz with this name already exists
+            const existingQuiz = quizData.quizzes.find(q => q.id === id);
+            
+            if (existingQuiz) {
+                // Use existing quiz
+                currentQuiz = existingQuiz;
+                showModal(`Editing existing quiz: "${name}"`);
+            } else {
+                // Create new quiz
+                currentQuiz = {
+                    id,
+                    name,
+                    levels: [],
+                    questions: {}
+                };
+                quizData.quizzes.push(currentQuiz);
+                showModal(`Quiz "${name}" created successfully!`);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+            
+            // Update UI
+            updateLevelSelect();
+            updateLevelList();
+        }
+
+        function saveQuiz() {
+            if (!currentQuiz) {
+                showModal("Please create a quiz first!");
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+            
+            showModal(`Quiz "${currentQuiz.name}" saved successfully!`);
+            
+            // Redirect back to main page after a short delay
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        function updateLevelSelect() {
+            levelSelect.innerHTML = '';
+            
+            if (!currentQuiz || currentQuiz.levels.length === 0) {
+                levelSelect.innerHTML = '<option value="">No levels available</option>';
+                return;
+            }
+            
+            currentQuiz.levels.forEach(level => {
+                const option = document.createElement('option');
+                option.value = level.id;
+                option.textContent = level.name;
+                levelSelect.appendChild(option);
             });
         }
 
-        function handleQuizAction(action, quizId) {
-            const quiz = quizData.quizzes.find(q => q.id === quizId);
-            if (!quiz) return;
+        function updateLevelList() {
+            levelList.innerHTML = '';
             
-            switch (action) {
-                case 'rename':
-                    quizToRename = quiz;
-                    renameInput.value = quiz.name;
-                    renameModal.style.display = 'flex';
-                    break;
-                case 'edit':
-                    window.location.href = `create_quiz.html?quizId=${quizId}`;
-                    break;
-                case 'export':
-                    exportQuiz(quiz);
-                    break;
-                case 'delete':
-                    if (confirm(`Are you sure you want to delete the quiz "${quiz.name}"? This action cannot be undone.`)) {
-                        deleteQuiz(quizId);
-                    }
-                    break;
+            if (!currentQuiz || currentQuiz.levels.length === 0) {
+                levelList.innerHTML = '<p>No levels created yet</p>';
+                return;
             }
-        }
-
-        function renameQuiz(quiz, newName) {
-            quiz.name = newName;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
-            updateQuizzesDisplay();
-            showModal(`Quiz renamed to "${newName}" successfully!`);
-        }
-
-        function exportQuiz(quiz) {
-            const dataStr = JSON.stringify(quiz);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            const exportFileDefaultName = `${quiz.name.replace(/\s+/g, '-')}-quiz.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            showModal(`Quiz "${quiz.name}" exported successfully!`);
-        }
-
-        function deleteQuiz(quizId) {
-            quizData.quizzes = quizData.quizzes.filter(q => q.id !== quizId);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
-            updateQuizzesDisplay();
-            updateStartMessage();
-            showModal("Quiz deleted successfully!");
-        }
-
-        function showQuizDetails(quiz) {
-            modalQuizTitle.textContent = quiz.name;
-            modalLevelsList.innerHTML = '';
-            
-            // Sort levels by order
-            const sortedLevels = [...quiz.levels].sort((a, b) => a.order - b.order);
-            
-            sortedLevels.forEach(level => {
+            currentQuiz.levels.forEach((level, index) => {
                 const levelItem = document.createElement('div');
-                levelItem.classList.add('level-list-item');
+                levelItem.classList.add('level-item');
                 levelItem.style.background = `linear-gradient(to right, ${level.color1}, ${level.color2})`;
                 
-                const questionCount = quiz.questions[level.id] ? quiz.questions[level.id].length : 0;
+                const questionCount = currentQuiz.questions && currentQuiz.questions[level.id] ? 
+                    currentQuiz.questions[level.id].length : 0;
                 
                 levelItem.innerHTML = `
                     <div>
                         <div>${level.name}</div>
+                        <div class="level-order">Order: ${level.order}</div>
                         <small>${questionCount} question${questionCount !== 1 ? 's' : ''}</small>
                     </div>
-                    <button class="level-action-btn" data-level="${level.id}">
-                        <i class="fas fa-play"></i> Play
-                    </button>
+                    <div class="level-actions">
+                        <div class="level-order-controls">
+                            <button class="order-btn" data-action="up" data-level="${level.id}" ${index === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="order-btn" data-action="down" data-level="${level.id}" ${index === currentQuiz.levels.length - 1 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                        <button class="level-action-btn" data-action="edit" data-level="${level.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="level-action-btn" data-action="delete" data-level="${level.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 `;
                 
-                levelItem.querySelector('button').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    currentQuizId = quiz.id;
-                    currentLevelId = level.id;
-                    startQuiz();
-                });
-                
-                modalLevelsList.appendChild(levelItem);
+                levelList.appendChild(levelItem);
             });
             
-            quizDetailsModal.style.display = 'flex';
+            // Add event listeners for edit and delete buttons
+            document.querySelectorAll('.level-action-btn[data-action="delete"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const levelId = btn.getAttribute('data-level');
+                    deleteLevel(levelId);
+                });
+            });
+            
+            document.querySelectorAll('.level-action-btn[data-action="edit"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const levelId = btn.getAttribute('data-level');
+                    editLevel(levelId);
+                });
+            });
+            
+            // Add event listeners for order buttons
+            document.querySelectorAll('.order-btn[data-action="up"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const levelId = btn.getAttribute('data-level');
+                    moveLevelUp(levelId);
+                });
+            });
+            
+            document.querySelectorAll('.order-btn[data-action="down"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const levelId = btn.getAttribute('data-level');
+                    moveLevelDown(levelId);
+                });
+            });
         }
 
-        function updateStartMessage() {
-            const validQuizzes = quizData.quizzes.filter(quiz => {
-                if (!quiz.levels || quiz.levels.length === 0) return false;
-                
-                let hasQuestions = false;
-                for (const level of quiz.levels) {
-                    if (quiz.questions[level.id] && quiz.questions[level.id].length > 0) {
-                        hasQuestions = true;
-                        break;
-                    }
-                }
-                return hasQuestions;
-            });
+        function updateQuestionsList() {
+            questionsList.innerHTML = '';
             
-            if (validQuizzes.length === 0) {
-                startMessage.textContent = "No quizzes yet! Click 'Create Your Quiz' to create your first quiz.";
+            if (!currentQuiz) return;
+            
+            let hasQuestions = false;
+            
+            for (const level of currentQuiz.levels) {
+                if (currentQuiz.questions && currentQuiz.questions[level.id] && currentQuiz.questions[level.id].length > 0) {
+                    hasQuestions = true;
+                    
+                    const levelHeader = document.createElement('h3');
+                    levelHeader.textContent = `Questions in ${level.name}`;
+                    questionsList.appendChild(levelHeader);
+                    
+                    currentQuiz.questions[level.id].forEach((question, index) => {
+                        const questionItem = document.createElement('div');
+                        questionItem.classList.add('question-item');
+                        
+                        questionItem.innerHTML = `
+                            <div class="question-text">${question.question}</div>
+                            <div class="question-options">
+                                <div class="question-option correct-option">✓ ${question.options[0]}</div>
+                                <div class="question-option">${question.options[1]}</div>
+                                <div class="question-option">${question.options[2]}</div>
+                                <div class="question-option">${question.options[3]}</div>
+                            </div>
+                            <div class="question-actions">
+                                <button class="edit-question-btn" data-level="${level.id}" data-index="${index}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="delete-question-btn" data-level="${level.id}" data-index="${index}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        `;
+                        
+                        questionsList.appendChild(questionItem);
+                    });
+                }
+            }
+            
+            if (!hasQuestions) {
+                questionsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-question-circle"></i>
+                        <p>No questions added yet. Add questions using the form above.</p>
+                    </div>
+                `;
             } else {
-                startMessage.textContent = "Select a quiz to start playing!";
+                // Add event listeners to edit and delete buttons
+                document.querySelectorAll('.edit-question-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const levelId = btn.getAttribute('data-level');
+                        const index = parseInt(btn.getAttribute('data-index'));
+                        editQuestion(levelId, index);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-question-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const levelId = btn.getAttribute('data-level');
+                        const index = parseInt(btn.getAttribute('data-index'));
+                        deleteQuestion(levelId, index);
+                    });
+                });
             }
         }
 
@@ -666,317 +592,320 @@
             errorModal.style.display = 'flex';
         }
 
-        function startQuiz() {
-            const quiz = quizData.quizzes.find(q => q.id === currentQuizId);
-            if (!quiz) {
-                showModal("Quiz not found!");
-                return;
-            }
+        function setupMediaUpload(section) {
+            const uploadInput = document.getElementById(`${section}-media-upload`);
+            const urlInput = document.getElementById(`${section}-media-url`);
+            const imagePreview = document.getElementById(`${section}-media-preview`);
+            const videoPreview = document.getElementById(`${section}-video-preview`);
             
-            // If playing in order, get all questions from all levels in order
-            if (currentLevelId === 'order') {
-                currentQuestions = [];
-                // Sort levels by order
-                const sortedLevels = [...quiz.levels].sort((a, b) => a.order - b.order);
-                
-                for (const level of sortedLevels) {
-                    if (quiz.questions[level.id] && quiz.questions[level.id].length > 0) {
-                        currentQuestions = currentQuestions.concat(quiz.questions[level.id]);
-                    }
-                }
-                
-                if (currentQuestions.length === 0) {
-                    showModal("No questions available for this quiz. Please add questions first.");
-                    return;
-                }
-            } else {
-                // Playing a specific level
-                if (!quiz.questions[currentLevelId] || quiz.questions[currentLevelId].length === 0) {
-                    showModal("No questions available for this level. Please add questions first.");
-                    return;
-                }
-                
-                currentQuestions = quiz.questions[currentLevelId];
-            }
+            if (!uploadInput || !urlInput) return;
             
-            startScreen.style.display = 'none';
-            quizContainer.style.display = 'block';
-            resultContainer.style.display = 'none';
-            quizDetailsModal.style.display = 'none';
-            
-            currentQuestionIndex = 0;
-            score = 0;
-            userAnswers = new Array(currentQuestions.length).fill(null);
-            
-            scoreElement.textContent = score;
-            
-            // Set level indicator
-            if (currentLevelId === 'order') {
-                document.getElementById('level-indicator').textContent = `${quiz.name} - All Levels`;
-                document.getElementById('level-indicator').style.background = `linear-gradient(to right, #6a11cb, #2575fc)`;
-            } else {
-                const currentLevel = quiz.levels.find(level => level.id === currentLevelId);
-                if (currentLevel) {
-                    document.getElementById('level-indicator').textContent = `${quiz.name} - ${currentLevel.name}`;
-                    document.getElementById('level-indicator').style.background = `linear-gradient(to right, ${currentLevel.color1}, ${currentLevel.color2})`;
-                }
-            }
-            
-            showQuestion();
-        }
-
-        function showQuestion() {
-            // Check if we have questions
-            if (currentQuestions.length === 0 || currentQuestionIndex >= currentQuestions.length) {
-                showModal("No questions available or invalid question index.");
-                return;
-            }
-            
-            const question = currentQuestions[currentQuestionIndex];
-            questionElement.textContent = question.question;
-            
-            // Update progress bar
-            progressElement.style.width = `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%`;
-            
-            // Display media
-            mediaContainer.innerHTML = '';
-            if (question.displayMedia && question.displayMedia.url) {
-                mediaContainer.classList.remove('hidden');
-                if (question.displayMedia.type === 'image') {
-                    const img = document.createElement('img');
-                    img.src = question.displayMedia.url;
-                    img.alt = "Question media";
-                    mediaContainer.appendChild(img);
-                } else {
-                    const video = document.createElement('video');
-                    video.src = question.displayMedia.url;
-                    video.alt = "Question media";
-                    video.autoplay = true;
-                    video.loop = true;
-                    video.muted = true;
-                    video.controls = true;
-                    mediaContainer.appendChild(video);
-                    activeMediaElements.push(video);
-                }
-            } else {
-                mediaContainer.classList.add('hidden');
-            }
-            
-            // Display options in shuffled order
-            optionsElement.innerHTML = '';
-            
-            // Create a unique key for this question to remember its shuffle order
-            const questionKey = `${currentQuizId}_${currentLevelId}_${currentQuestionIndex}`;
-            
-            // If we haven't shuffled this question before, do it now
-            if (!questionShuffleMap[questionKey]) {
-                // Create a copy of the options array and shuffle it
-                const shuffledOptions = shuffleArray([...question.options]);
-                questionShuffleMap[questionKey] = {
-                    options: shuffledOptions,
-                    correctIndex: shuffledOptions.indexOf(question.options[0]) // Find where the correct answer ended up
-                };
-            }
-            
-            shuffledData = questionShuffleMap[questionKey];
-            
-            shuffledData.options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.classList.add('option');
-                if (userAnswers[currentQuestionIndex] === index) {
-                    optionElement.classList.add('selected');
-                }
-                optionElement.textContent = option;
-                optionElement.addEventListener('click', () => selectOption(index, shuffledData.correctIndex));
-                optionsElement.appendChild(optionElement);
-            });
-            
-            // Update navigation buttons
-            prevButton.disabled = currentQuestionIndex === 0;
-            nextButton.textContent = currentQuestionIndex === currentQuestions.length - 1 ? 'Finish' : 'Next';
-            nextButton.disabled = userAnswers[currentQuestionIndex] === null;
-        }
-
-        function selectOption(selectedIndex, correctIndex) {
-            // If already answered this question, don't allow changing
-            if (userAnswers[currentQuestionIndex] !== null) return;
-            
-            userAnswers[currentQuestionIndex] = selectedIndex;
-            
-            // Update visual selection
-            const options = optionsElement.querySelectorAll('.option');
-            options.forEach((option, index) =>{
-                option.classList.remove('selected', 'correct', 'incorrect');
-                if (index === selectedIndex) {
-                    option.classList.add('selected');
-                }
-            });
-            
-            // Check if answer is correct
-            if (selectedIndex === correctIndex) {
-                score++;
-                scoreElement.textContent = score;
-                options[selectedIndex].classList.add('correct');
-            } else {
-                options[selectedIndex].classList.add('incorrect');
-                options[correctIndex].classList.add('correct');
-            }
-            
-            // Stop any playing media in the question
-            stopAllMedia();
-            
-            // Show after-answer media in fullscreen overlay
-            afterMediaContainer.innerHTML = '';
-            const question = currentQuestions[currentQuestionIndex];
-            if (question.afterMedia && question.afterMedia.url) {
-                if (question.afterMedia.type === 'image') {
-                    const img = document.createElement('img');
-                    img.src = question.afterMedia.url;
-                    img.alt = "Answer media";
-                    afterMediaContainer.appendChild(img);
-                } else {
-                    const video = document.createElement('video');
-                    video.src = question.afterMedia.url;
-                    video.alt = "Answer media";
-                    video.autoplay = true;
-                    video.loop = true;
-                    video.muted = true;
-                    video.controls = true;
-                    afterMediaContainer.appendChild(video);
-                    activeMediaElements.push(video);
-                }
-                afterMediaOverlay.style.display = 'flex';
-            } else {
-                // If no after-answer media, proceed automatically
-                if (currentQuestionIndex < currentQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    showQuestion();
-                } else {
-                    finishQuiz();
-                }
-            }
-        }
-
-        prevButton.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                // Stop any playing media
-                stopAllMedia();
-                currentQuestionIndex--;
-                showQuestion();
-            }
-        });
-
-        nextButton.addEventListener('click', () =>{
-            if (userAnswers[currentQuestionIndex] === null) {
-                showModal("Please select an answer before proceeding!");
-                return;
-            }
-            
-            // Stop any playing media
-            stopAllMedia();
-            
-            if (currentQuestionIndex < currentQuestions.length - 1) {
-                currentQuestionIndex++;
-                showQuestion();
-            } else {
-                finishQuiz();
-            }
-        });
-
-        function finishQuiz() {
-            quizContainer.style.display = 'none';
-            resultContainer.style.display = 'block';
-            
-            finalScoreElement.textContent = `${score}/${currentQuestions.length}`;
-            
-            // Generate a result message based on score
-            const percentage = score / currentQuestions.length;
-            let message;
-            
-            if (percentage === 1) {
-                message = "Perfect! You're a quiz master!";
-            } else if (percentage >= 0.8) {
-                message = "Great job! You know your stuff!";
-            } else if (percentage >= 0.6) {
-                message = "Good effort! Keep practicing!";
-            } else if (percentage >= 0.4) {
-                message = "Not bad, but room for improvement!";
-            } else {
-                message = "Better luck next time!";
-            }
-            
-            resultMessageElement.textContent = message;
-        }
-
-        playAgainButton.addEventListener('click', () => {
-            resultContainer.style.display = 'none';
-            startScreen.style.display = 'block';
-            // Clear the shuffle map when playing again
-            questionShuffleMap = {};
-        });
-
-        function importQuizData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    
-                    // Validate the imported data structure
-                    if (importedData && importedData.quizzes !== undefined) {
-                        if (confirm("Importing quiz data will add to your current quizzes. Continue?")) {
-                            // Merge imported quizzes with existing ones
-                            for (const importedQuiz of importedData.quizzes) {
-                                // Check if quiz with same ID already exists
-                                const existingIndex = quizData.quizzes.findIndex(q => q.id === importedQuiz.id);
-                                
-                                if (existingIndex >= 0) {
-                                    // Ask if user wants to replace existing quiz
-                                    if (confirm(`A quiz named "${importedQuiz.name}" already exists. Replace it?`)) {
-                                        quizData.quizzes[existingIndex] = importedQuiz;
-                                    }
-                                } else {
-                                    // Add new quiz
-                                    quizData.quizzes.push(importedQuiz);
-                                }
-                            }
-                            
-                            // Save to localStorage
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
-                            
-                            // Update UI
-                            updateQuizzesDisplay();
-                            updateStartMessage();
-                            
-                            showModal("Quiz data imported successfully!");
+            uploadInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        if (file.type.startsWith('image/')) {
+                            imagePreview.src = event.target.result;
+                            imagePreview.style.display = 'block';
+                            videoPreview.style.display = 'none';
+                            // Set active button to image
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.add('active');
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.remove('active');
+                        } else if (file.type.startsWith('video/')) {
+                            videoPreview.src = event.target.result;
+                            videoPreview.style.display = 'block';
+                            imagePreview.style.display = 'none';
+                            // Set active button to video
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.add('active');
+                            document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.remove('active');
                         }
-                    } else {
-                        showModal("Invalid quiz data format. Please import a valid JSON file.");
-                    }
-                } catch (error) {
-                    showModal("Error parsing JSON file. Please make sure it's a valid quiz data file.");
+                        urlInput.value = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
                 }
-            };
-            reader.readAsText(file);
+            });
             
-            // Reset the file input
-            event.target.value = '';
+            urlInput.addEventListener('input', function() {
+                if (this.value) {
+                    if (this.value.match(/\.(mp4|webm|ogg)$/i)) {
+                        videoPreview.src = this.value;
+                        videoPreview.style.display = 'block';
+                        imagePreview.style.display = 'none';
+                        // Set active button to video
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.add('active');
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.remove('active');
+                    } else {
+                        imagePreview.src = this.value;
+                        imagePreview.style.display = 'block';
+                        videoPreview.style.display = 'none';
+                        // Set active button to image
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="image"]`).classList.add('active');
+                        document.querySelector(`.media-type-btn[data-for="${section}"][data-type="video"]`).classList.remove('active');
+                    }
+                } else {
+                    // If URL is empty, hide previews
+                    imagePreview.style.display = 'none';
+                    videoPreview.style.display = 'none';
+                }
+            });
         }
 
-        // Helper function to convert hex color to RGB
-        function hexToRgb(hex) {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : {r: 0, g: 0, b: 0};
+        function addCustomLevel() {
+            if (!currentQuiz) {
+                showModal("Please create a quiz first!");
+                return;
+            }
+            
+            const name = levelNameInput.value.trim();
+            const color1 = levelColor1Input.value;
+            const color2 = levelColor2Input.value;
+            
+            if (!name) {
+                showModal("Please enter a level name!");
+                return;
+            }
+            
+            // Create a simple ID for the level
+            const id = `${currentQuiz.id}-${name.toLowerCase().replace(/\s+/g, '-')}`;
+            
+            // Check if level with this name already exists
+            if (currentQuiz.levels.some(level => level.id === id)) {
+                showModal("A level with this name already exists in this quiz!");
+                return;
+            }
+            
+            // Determine the order (next available)
+            const order = currentQuiz.levels.length > 0 ? 
+                Math.max(...currentQuiz.levels.map(l => l.order)) + 1 : 1;
+            
+            // Add the new level
+            currentQuiz.levels.push({
+                id,
+                name,
+                color1,
+                color2,
+                order
+            });
+            
+            // Initialize empty questions array for this level
+            if (!currentQuiz.questions) {
+                currentQuiz.questions = {};
+            }
+            if (!currentQuiz.questions[id]) {
+                currentQuiz.questions[id] = [];
+            }
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+            
+            // Update UI
+            updateLevelSelect();
+            updateLevelList();
+            
+            // Reset form
+            levelNameInput.value = '';
+            
+            showModal(`Level "${name}" created successfully!`);
         }
 
-        // Initialize the quiz
-        initQuiz();
+        function deleteLevel(levelId) {
+            if (!confirm("Are you sure you want to delete this level? All questions in this level will also be deleted.")) {
+                return;
+            }
+            
+            // Remove level from levels array
+            currentQuiz.levels = currentQuiz.levels.filter(level => level.id !== levelId);
+            
+            // Remove questions for this level
+            if (currentQuiz.questions) {
+                delete currentQuiz.questions[levelId];
+            }
+            
+            // Reorder remaining levels
+            currentQuiz.levels.forEach((level, index) => {
+                level.order = index + 1;
+            });
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+            
+            // Update UI
+            updateLevelSelect();
+            updateLevelList();
+            updateQuestionsList();
+            
+            showModal("Level deleted successfully!");
+        }
+
+        function moveLevelUp(levelId) {
+            const index = currentQuiz.levels.findIndex(level => level.id === levelId);
+            if (index > 0) {
+                // Swap levels
+                [currentQuiz.levels[index], currentQuiz.levels[index - 1]] = 
+                [currentQuiz.levels[index - 1], currentQuiz.levels[index]];
+                
+                // Update orders
+                currentQuiz.levels[index].order = index + 1;
+                currentQuiz.levels[index - 1].order = index;
+                
+                // Save to localStorage
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+                
+                // Update UI
+                updateLevelList();
+            }
+        }
+
+        function moveLevelDown(levelId) {
+            const index = currentQuiz.levels.findIndex(level => level.id === levelId);
+            if (index < currentQuiz.levels.length - 1) {
+                // Swap levels
+                [currentQuiz.levels[index], currentQuiz.levels[index + 1]] = 
+                [currentQuiz.levels[index + 1], currentQuiz.levels[index]];
+                
+                // Update orders
+                currentQuiz.levels[index].order = index + 1;
+                currentQuiz.levels[index + 1].order = index + 2;
+                
+                // Save to localStorage
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+                
+                // Update UI
+                updateLevelList();
+            }
+        }
+
+        function editLevel(levelId) {
+            // For simplicity, we'll just allow deletion and recreation
+            // In a more advanced version, you could implement a proper edit form
+            const level = currentQuiz.levels.find(l => l.id === levelId);
+            if (level) {
+                levelNameInput.value = level.name;
+                levelColor1Input.value = level.color1;
+                levelColor2Input.value = level.color2;
+                
+                // Delete the old level and create a new one when Add is clicked
+                deleteLevel(levelId);
+            }
+        }
+
+        function resetAdminForm() {
+            // Reset all form fields
+            document.getElementById('admin-question').value = '';
+            document.getElementById('admin-option1').value = '';
+            document.getElementById('admin-option2').value = '';
+            document.getElementById('admin-option3').value = '';
+            document.getElementById('admin-option4').value = '';
+            
+            // Reset media URLs
+            document.getElementById('admin-display-media-url').value = '';
+            document.getElementById('admin-after-media-url').value = '';
+            
+            // Reset file inputs
+            document.getElementById('admin-display-media-upload').value = '';
+            document.getElementById('admin-after-media-upload').value = '';
+            
+            // Reset previews
+            document.getElementById('display-media-preview').style.display = 'none';
+            document.getElementById('display-video-preview').style.display = 'none';
+            document.getElementById('after-media-preview').style.display = 'none';
+            document.getElementById('after-video-preview').style.display = 'none';
+            
+            // Reset media type buttons to image
+            document.querySelectorAll('.media-type-btn').forEach(btn => {
+                if (btn.getAttribute('data-type') === 'image') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function addCustomQuestion() {
+            if (!currentQuiz) {
+                showModal("Please create a quiz first!");
+                return;
+            }
+            
+            const levelId = levelSelect.value;
+            const questionText = document.getElementById('admin-question').value;
+            const option1 = document.getElementById('admin-option1').value;
+            const option2 = document.getElementById('admin-option2').value;
+            const option3 = document.getElementById('admin-option3').value;
+            const option4 = document.getElementById('admin-option4').value;
+            
+            // Get display media type and URL
+            const displayMediaType = document.querySelector('.media-type-btn[data-for="display"].active').getAttribute('data-type');
+            const displayMediaUrl = document.getElementById('admin-display-media-url').value;
+            
+            // Get after-answer media type and URL
+            const afterMediaType = document.querySelector('.media-type-btn[data-for="after"].active').getAttribute('data-type');
+            const afterMediaUrl = document.getElementById('admin-after-media-url').value;
+
+            // Validate inputs
+            if (!levelId) {
+                showModal("Please select a level first!");
+                return;
+            }
+            
+            if (!questionText || !option1 || !option2 || !option3 || !option4) {
+                showModal("Please fill in all question and answer fields!");
+                return;
+            }
+
+            // Create new question object
+            const newQuestion = {
+                question: questionText,
+                options: [option1, option2, option3, option4],
+                correct: 0,
+                displayMedia: displayMediaUrl ? {
+                    type: displayMediaType,
+                    url: displayMediaUrl
+                } : null,
+                afterMedia: afterMediaUrl ? {
+                    type: afterMediaType,
+                    url: afterMediaUrl
+                } : null
+            };
+
+            // Add to questions
+            if (!currentQuiz.questions) {
+                currentQuiz.questions = {};
+            }
+            if (!currentQuiz.questions[levelId]) {
+                currentQuiz.questions[levelId] = [];
+            }
+            currentQuiz.questions[levelId].push(newQuestion);
+
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+
+            // Reset the form
+            resetAdminForm();
+
+            // Update UI
+            updateLevelList();
+            updateQuestionsList();
+            
+            showModal(`Question added to level! The correct answer will be randomly positioned.`);
+        }
+
+        function resetQuestions() {
+            if (confirm("Are you sure you want to reset all questions in this quiz? This cannot be undone.")) {
+                currentQuiz.questions = {};
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+                
+                // Update UI
+                updateLevelList();
+                updateQuestionsList();
+                
+                showModal("All questions have been reset!");
+            }
+        }
+
+        // Initialize the admin panel
+        initAdmin();
     </script>
 </body>
 </html>
