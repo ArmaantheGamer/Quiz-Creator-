@@ -895,3 +895,90 @@ p {
         flex-direction: column;
     }
 }
+/* Override: make level cards wider + add spacing */
+.level-list {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+}
+
+.level-item {
+    padding: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    min-height: 90px !important;
+}
+
+.level-actions {
+    margin-top: 6px !important;
+}
+/* Enhanced level action styles */
+.level-item .level-info .level-title {
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+    font-weight: 700;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+}
+.level-item .level-info .level-order {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 6px;
+}
+.level-item .level-info .level-count {
+    font-size: 0.85rem;
+    opacity: 0.95;
+}
+
+/* Order buttons */
+.order-btn {
+    background: rgba(255,255,255,0.18);
+    border: none;
+    padding: 6px;
+    border-radius: 6px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.order-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+.order-btn:hover:not(:disabled) { transform: translateY(-2px); background: rgba(255,255,255,0.26); }
+
+/* Edit/Delete buttons distinct */
+.level-action-btn {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .12s ease, transform .12s ease;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+.level-action-btn i { font-size: 0.95rem; }
+.level-action-btn:hover { transform: translateY(-3px); background: rgba(255,255,255,0.22); }
+
+/* Edit button style */
+.btn-edit { background: rgba(0,0,0,0.15); }
+.btn-edit:hover { background: rgba(0,123,255,0.22); color: #fff; }
+
+/* Delete button style */
+.btn-delete { background: rgba(255,0,0,0.12); }
+.btn-delete:hover { background: rgba(255,0,0,0.22); color: #fff; }
+
+/* Layout tweaks */
+.level-actions { display:flex; gap:10px; align-items:center; margin-top:8px; }
+.level-order-controls { display:flex; gap:8px; }
+
+/* Make sure icons are visible on dark gradients */
+.level-item i { color: rgba(255,255,255,0.95); }
