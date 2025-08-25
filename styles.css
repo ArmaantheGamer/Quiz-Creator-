@@ -143,7 +143,7 @@ p {
     display: none;
 }
 
-.media-container img, .media-container video {
+.media-container img, .media-container video, .media-container audio {
     width: 100%;
     height: auto;
     max-height: 350px;
@@ -480,6 +480,10 @@ p {
     transition: all 0.3s ease;
 }
 
+.modal-btn:hover {
+    background: linear-gradient(to bottom, #073b4c, #052837);
+}
+
 .data-actions {
     margin: 20px 0;
     display: flex;
@@ -598,7 +602,8 @@ p {
 }
 
 .after-media-container img, 
-.after-media-container video {
+.after-media-container video,
+.after-media-container audio {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
@@ -643,6 +648,196 @@ p {
     color: #118ab2;
 }
 
+/* Answer feedback styles */
+.answer-feedback {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.3rem;
+    display: none;
+}
+
+.correct-feedback {
+    background: linear-gradient(to right, #90ee90, #77dd77);
+    color: #2e8b57;
+    border: 2px solid #32cd32;
+}
+
+.incorrect-feedback {
+    background: linear-gradient(to right, #ffcccb, #ffaaa9);
+    color: #dc143c;
+    border: 2px solid #ff6b6b;
+}
+
+.feedback-emoji {
+    font-size: 2rem;
+    margin-right: 10px;
+}
+
+/* Next question button */
+.next-question-btn {
+    padding: 15px 30px;
+    background: linear-gradient(to bottom, #06d6a0, #04a57a);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: none;
+    margin: 20px auto;
+}
+
+.next-question-btn:hover {
+    background: linear-gradient(to bottom, #04a57a, #038c65);
+    transform: scale(1.05);
+}
+
+/* Level introduction overlay */
+.level-intro-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.level-intro-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.level-intro-title {
+    font-size: 2.5rem;
+    color: #6a11cb;
+    margin-bottom: 20px;
+    font-weight: 900;
+}
+
+.level-intro-description {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    color: #073b4c;
+}
+
+.level-intro-btn {
+    padding: 15px 40px;
+    background: linear-gradient(to bottom, #ffd166, #ffb700);
+    color: #333;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.level-intro-btn:hover {
+    background: linear-gradient(to bottom, #ffb700, #ff9e00);
+    transform: scale(1.05);
+}
+
+/* Quiz progress indicator */
+.quiz-progress {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.progress-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+    background: #06d6a0;
+    transform: scale(1.2);
+}
+
+.progress-dot.completed {
+    background: #118ab2;
+}
+
+/* Question item styles for admin panel */
+.question-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #118ab2;
+}
+
+.question-text {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #073b4c;
+}
+
+.question-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.question-option {
+    padding: 8px;
+    background: #e9ecef;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.correct-option {
+    background: #d1e7dd;
+    border: 1px solid #0f5132;
+    color: #0f5132;
+}
+
+.question-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-question-btn, .delete-question-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.edit-question-btn {
+    background: #0dcaf0;
+    color: #000;
+}
+
+.delete-question-btn {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Media queries for responsiveness */
 @media (max-width: 768px) {
     h1 {
         font-size: 2.2rem;
@@ -690,5 +885,13 @@ p {
     .credits {
         font-size: 0.9rem;
         padding: 10px;
+    }
+    
+    .question-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .question-actions {
+        flex-direction: column;
     }
 }
