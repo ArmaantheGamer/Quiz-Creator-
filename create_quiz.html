@@ -3,279 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Your Quiz - My Life, My Quiz</title>
+    <title>Create Quiz - My Life, My Quiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Additional styles for the create quiz page */
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: 12px 20px;
+        .quiz-creator {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .creator-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .creator-header h1 {
+            color: #ff6b6b;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 #ffd166;
+        }
+        
+        .creator-header p {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        
+        .back-to-quizzes {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
             background: linear-gradient(to bottom, #6a11cb, #2575fc);
             color: white;
-            border: none;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: bold;
         }
         
-        .back-button:hover {
-            background: linear-gradient(to bottom, #2575fc, #6a11cb);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .admin-panel {
-            display: block;
-            margin-top: 20px;
-        }
-        
-        .quiz-name-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f1faee;
+        .quiz-form {
+            background: white;
             border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
-        .level-order-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
         }
         
-        .order-btn {
-            padding: 8px 12px;
-            background: #118ab2;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .current-quiz-name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #073b4c;
+        .form-section h3 {
+            color: #118ab2;
             margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #a8dadc;
         }
         
-        /* Question editor styles */
         .questions-list {
-            margin-top: 30px;
-            border-top: 2px solid #a8dadc;
-            padding-top: 20px;
-        }
-        
-        .question-item {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
             background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
             margin-bottom: 15px;
-            border-left: 4px solid #118ab2;
+            color: #ced4da;
         }
         
-        .question-text {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .question-options {
-            margin-left: 20px;
-        }
-        
-        .question-option {
-            margin-bottom: 5px;
-        }
-        
-        .correct-option {
-            color: #06d6a0;
-            font-weight: bold;
-        }
-        
-        .question-actions {
-            margin-top: 10px;
+        .form-actions {
             display: flex;
-            gap: 10px;
-        }
-        
-        .edit-question-btn {
-            padding: 8px 12px;
-            background: #118ab2;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        
-        .delete-question-btn {
-            padding: 8px 12px;
-            background: #ef476f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        
-        /* Fix for level order display */
-        .level-item > div:first-child {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .level-order {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-top: 5px;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="back-button">
-            <i class="fas fa-arrow-left"></i> Back to Main Menu
-        </a>
-        
-        <h1>Create Your Quiz</h1>
-        <p>Add your own questions and media to create a custom quiz experience!</p>
-        
-        <div class="quiz-name-section">
-            <h2>Quiz Information</h2>
-            <div class="form-group">
-                <label for="quiz-name">Quiz Name</label>
-                <input type="text" id="quiz-name" placeholder="Enter quiz name">
-            </div>
-            <button class="admin-btn" id="save-quiz-name-btn"><i class="fas fa-save"></i> Save Quiz Name</button>
+        <div class="quiz-creator">
+            <a href="index.html" class="back-to-quizzes">
+                <i class="fas fa-arrow-left"></i> Back to Quizzes
+            </a>
             
-            <div id="current-quiz-info" style="display: none; margin-top: 20px;">
-                <div class="current-quiz-name" id="current-quiz-name"></div>
-                <div class="form-group">
-                    <label>Quiz ID: <span id="current-quiz-id"></span></label>
-                </div>
+            <div class="creator-header">
+                <h1>Create Your Quiz</h1>
+                <p>Design your custom quiz with multiple levels and media-rich questions</p>
             </div>
-        </div>
-        
-        <div id="admin-panel" class="admin-panel">
-            <h2>Quiz Creator Panel</h2>
-            <p>Add your own questions and media to the quiz! (Changes are saved to your browser's storage)</p>
             
-            <div class="level-manager">
-                <h3>Level Manager</h3>
-                <p>Create levels for your quiz and set their order</p>
-                
-                <div class="level-form">
+            <div class="quiz-form">
+                <div class="form-section">
+                    <h3>Quiz Information</h3>
                     <div class="form-group">
-                        <label for="level-name">Level Name</label>
-                        <input type="text" id="level-name" placeholder="Enter level name">
+                        <label for="quiz-name">Quiz Name</label>
+                        <input type="text" id="quiz-name" placeholder="Enter a name for your quiz">
+                    </div>
+                    <button id="save-quiz-name-btn" class="admin-btn">
+                        <i class="fas fa-save"></i> Save Quiz Name
+                    </button>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Level Management</h3>
+                    <div class="level-form">
+                        <div class="form-group">
+                            <label for="level-name">Level Name</label>
+                            <input type="text" id="level-name" placeholder="Enter level name">
+                        </div>
+                        <div class="form-group">
+                            <label for="level-color1">Color 1</label>
+                            <input type="color" id="level-color1" value="#6a11cb">
+                        </div>
+                        <div class="form-group">
+                            <label for="level-color2">Color 2</label>
+                            <input type="color" id="level-color2" value="#2575fc">
+                        </div>
+                        <button id="add-level-btn" class="admin-btn">
+                            <i class="fas fa-plus"></i> Add Level
+                        </button>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="level-color1">Color 1</label>
-                        <input type="color" id="level-color1" value="#ffd166">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="level-color2">Color 2</label>
-                        <input type="color" id="level-color2" value="#ffb700">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>&nbsp;</label>
-                        <button class="admin-btn" id="add-level-btn"><i class="fas fa-plus"></i> Add Level</button>
+                    <div id="level-list" class="level-list">
+                        <!-- Levels will be added here -->
                     </div>
                 </div>
                 
-                <div class="level-list" id="level-list">
-                    <!-- Levels will be listed here -->
+                <div class="form-section">
+                    <h3>Add Questions</h3>
+                    <div class="admin-form">
+                        <div class="form-group full-width">
+                            <label for="admin-difficulty">Select Level</label>
+                            <select id="admin-difficulty">
+                                <option value="">Select a level first</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="admin-question">Question</label>
+                            <textarea id="admin-question" placeholder="Enter your question"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option1">Option 1 (Correct Answer)</label>
+                            <input type="text" id="admin-option1" placeholder="Correct answer">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option2">Option 2</label>
+                            <input type="text" id="admin-option2" placeholder="Option 2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option3">Option 3</label>
+                            <input type="text" id="admin-option3" placeholder="Option 3">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-option4">Option 4</label>
+                            <input type="text" id="admin-option4" placeholder="Option 4">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>Display Media (Optional)</label>
+                            <div class="media-upload-section">
+                                <div class="media-type-selector">
+                                    <button class="media-type-btn active" data-type="image" data-for="display">
+                                        <i class="fas fa-image"></i> Image
+                                    </button>
+                                    <button class="media-type-btn" data-type="video" data-for="display">
+                                        <i class="fas fa-video"></i> Video
+                                    </button>
+                                </div>
+                                <input type="file" id="display-media-upload" accept="image/*,video/*" style="display: none;">
+                                <button type="button" class="data-btn" id="display-media-upload-btn" style="margin-bottom: 10px;">
+                                    <i class="fas fa-upload"></i> Upload Media
+                                </button>
+                                <input type="text" id="display-media-url" placeholder="Or enter media URL">
+                                <img id="display-media-preview" class="media-preview">
+                                <video id="display-video-preview" class="media-preview" controls style="display: none;"></video>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>After-Answer Media (Optional)</label>
+                            <div class="media-upload-section">
+                                <div class="media-type-selector">
+                                    <button class="media-type-btn active" data-type="image" data-for="after">
+                                        <i class="fas fa-image"></i> Image
+                                    </button>
+                                    <button class="media-type-btn" data-type="video" data-for="after">
+                                        <i class="fas fa-video"></i> Video
+                                    </button>
+                                </div>
+                                <input type="file" id="after-media-upload" accept="image/*,video/*" style="display: none;">
+                                <button type="button" class="data-btn" id="after-media-upload-btn" style="margin-bottom: 10px;">
+                                    <i class="fas fa-upload"></i> Upload Media
+                                </button>
+                                <input type="text" id="after-media-url" placeholder="Or enter media URL">
+                                <img id="after-media-preview" class="media-preview">
+                                <video id="after-video-preview" class="media-preview" controls style="display: none;"></video>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <button id="add-question-btn" class="admin-btn">
+                                <i class="fas fa-plus-circle"></i> Add Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Current Questions</h3>
+                    <div id="questions-list" class="questions-list">
+                        <div class="empty-state">
+                            <i class="fas fa-question-circle"></i>
+                            <p>No questions added yet. Add questions using the form above.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button id="save-quiz-btn" class="admin-btn" style="background: linear-gradient(to bottom, #06d6a0, #04a57a);">
+                        <i class="fas fa-save"></i> Save Quiz
+                    </button>
+                    <button id="reset-questions-btn" class="admin-btn" style="background: linear-gradient(to bottom, #ef476f, #d90429);">
+                        <i class="fas fa-trash"></i> Reset All
+                    </button>
                 </div>
             </div>
-            
-            <div class="admin-form">
-                <div class="form-group full-width">
-                    <label for="admin-difficulty">Level</label>
-                    <select id="admin-difficulty">
-                        <!-- Levels will be populated here -->
-                    </select>
-                </div>
-                
-                <div class="form-group full-width">
-                    <label for="admin-question">Question</label>
-                    <input type="text" id="admin-question" placeholder="Enter your question here">
-                </div>
-                
-                <div class="form-group">
-                    <label for="admin-option1">Correct Answer</label>
-                    <input type="text" id="admin-option1" placeholder="Correct answer">
-                </div>
-                
-                <div class="form-group">
-                    <label for="admin-option2">Option 2</label>
-                    <input type="text" id="admin-option2" placeholder="Incorrect answer">
-                </div>
-                
-                <div class="form-group">
-                    <label for="admin-option3">Option 3</label>
-                    <input type="text" id="admin-option3" placeholder="Incorrect answer">
-                </div>
-                
-                <div class="form-group">
-                    <label for="admin-option4">Option 4</label>
-                    <input type="text" id="admin-option4" placeholder="Incorrect answer">
-                </div>
-                
-                <div class="form-group full-width">
-                    <h3>Display Media (Shows with question) <span class="optional-label">(Optional)</span></h3>
-                    <div class="media-type-selector">
-                        <button type="button" class="media-type-btn active" data-type="image" data-for="display">Image</button>
-                        <button type="button" class="media-type-btn" data-type="video" data-for="display">Video</button>
-                    </div>
-                    <div class="media-upload-section">
-                        <input type="file" id="admin-display-media-upload" accept="image/*,video/*">
-                        <input type="text" id="admin-display-media-url" placeholder="Paste URL here (optional)">
-                        <img id="display-media-preview" class="media-preview" alt="Media preview">
-                        <video id="display-video-preview" class="media-preview" controls style="display:none"></video>
-                    </div>
-                </div>
-                
-                <div class="form-group full-width">
-                    <h3>After-Answer Media (Shows after answering) <span class="optional-label">(Optional)</span></h3>
-                    <div class="media-type-selector">
-                        <button type="button" class="media-type-btn active" data-type="image" data-for="after">Image</button>
-                        <button type="button" class="media-type-btn" data-type="video" data-for="after">Video</button>
-                    </div>
-                    <div class="media-upload-section">
-                        <input type="file" id="admin-after-media-upload" accept="image/*,video/*">
-                        <input type="text" id="admin-after-media-url" placeholder="Paste URL here (optional)">
-                        <img id="after-media-preview" class="media-preview" alt="Media preview">
-                        <video id="after-video-preview" class="media-preview" controls style="display:none"></video>
-                    </div>
-                </div>
-                
-                <div class="form-group full-width">
-                    <button class="admin-btn" id="add-question-btn"><i class="fas fa-plus"></i> Add Question</button>
-                    <button class="admin-btn" id="view-questions-btn" style="background: #06d6a0;"><i class="fas fa-eye"></i> View Questions</button>
-                    <button class="admin-btn" id="reset-questions-btn" style="background: #ef476f;"><i class="fas fa-trash"></i> Reset All</button>
-                </div>
-            </div>
-            
-            <div class="questions-list" id="questions-list">
-                <!-- Questions will be listed here -->
-            </div>
-        </div>
-        
-        <!-- Credits section -->
-        <div class="credits">
-            <p>Created by <strong>naamra</strong> - A student of X-E (CRPF Public School)</p>
         </div>
     </div>
 
@@ -288,71 +254,1183 @@
         </div>
     </div>
 
-    <!-- Question editor modal -->
-    <div class="modal" id="question-editor-modal">
-        <div class="modal-content">
-            <h2>Edit Question</h2>
-            <div class="admin-form">
-                <div class="form-group full-width">
-                    <label for="edit-question">Question</label>
-                    <input type="text" id="edit-question" placeholder="Enter your question here">
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-option1">Correct Answer</label>
-                    <input type="text" id="edit-option1" placeholder="Correct answer">
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-option2">Option 2</label>
-                    <input type="text" id="edit-option2" placeholder="Incorrect answer">
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-option3">Option 3</label>
-                    <input type="text" id="edit-option3" placeholder="Incorrect answer">
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-option4">Option 4</label>
-                    <input type="text" id="edit-option4" placeholder="Incorrect answer">
-                </div>
-                
-                <div class="form-group full-width">
-                    <h3>Display Media (Shows with question) <span class="optional-label">(Optional)</span></h3>
-                    <div class="media-type-selector">
-                        <button type="button" class="media-type-btn active" data-type="image" data-for="edit-display">Image</button>
-                        <button type="button" class="media-type-btn" data-type="video" data-for="edit-display">Video</button>
-                    </div>
-                    <div class="media-upload-section">
-                        <input type="file" id="edit-display-media-upload" accept="image/*,video/*">
-                        <input type="text" id="edit-display-media-url" placeholder="Paste URL here (optional)">
-                        <img id="edit-display-media-preview" class="media-preview" alt="Media preview">
-                        <video id="edit-display-video-preview" class="media-preview" controls style="display:none"></video>
-                    </div>
-                </div>
-                
-                <div class="form-group full-width">
-                    <h3>After-Answer Media (Shows after answering) <span class="optional-label">(Optional)</span></h3>
-                    <div class="media-type-selector">
-                        <button type="button" class="media-type-btn active" data-type="image" data-for="edit-after">Image</button>
-                        <button type="button" class="media-type-btn" data-type="video" data-for="edit-after">Video</button>
-                    </div>
-                    <div class="media-upload-section">
-                        <input type="file" id="edit-after-media-upload" accept="image/*,video/*">
-                        <input type="text" id="edit-after-media-url" placeholder="Paste URL here (optional)">
-                        <img id="edit-after-media-preview" class="media-preview" alt="Media preview">
-                        <video id="edit-after-video-preview" class="media-preview" controls style="display:none"></video>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                <button class="modal-btn" id="edit-question-cancel-btn">Cancel</button>
-                <button class="modal-btn" id="edit-question-save-btn" style="background: #06d6a0;">Save Changes</button>
-            </div>
-        </div>
-    </div>
+<script>
+/* ===========================
+   CREATE_QUIZ.HTML - SCRIPT
+   Defensive, backwards-compatible single script
+   Adds level-wise question grouping with edit/delete
+   =========================== */
 
-    <script src="admin.js"></script>
+/* Storage key */
+const STORAGE_KEY = 'mediaQuiz_Quizzes';
+
+/* Default data shape */
+const defaultData = { quizzes: [] };
+
+/* Helper: safe getElementById that returns null if not found */
+function $id(...ids) {
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (el) return el;
+  }
+  return null;
+}
+
+/* DOM elements (try multiple possible IDs for compatibility) */
+const quizNameInput = $id('quiz-name');
+const saveQuizNameBtn = $id('save-quiz-name-btn');
+const saveQuizBtn = $id('save-quiz-btn');
+const levelSelect = $id('admin-difficulty', 'admin-level-select', 'difficulty', 'level-select');
+const levelNameInput = $id('level-name', 'admin-level-name');
+const levelColor1Input = $id('level-color1', 'admin-level-color1');
+const levelColor2Input = $id('level-color2', 'admin-level-color2');
+const addLevelBtn = $id('add-level-btn');
+const levelList = $id('level-list');
+const addQuestionBtn = $id('add-question-btn');
+const resetQuestionsBtn = $id('reset-questions-btn');
+const questionsList = $id('questions-list');
+const errorModal = $id('error-modal');
+const modalMessage = $id('modal-message');
+const modalOkBtn = $id('modal-ok-btn');
+const displayMediaUploadBtn = $id('display-media-upload-btn');
+const displayMediaUpload = $id('display-media-upload');
+const afterMediaUploadBtn = $id('after-media-upload-btn');
+const afterMediaUpload = $id('after-media-upload');
+
+/* Quiz data */
+let quizData = {};
+let currentQuiz = null;
+
+/* -------------------------
+   Initialization
+   ------------------------- */
+function initAdmin() {
+  // load or initialize storage
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      quizData = JSON.parse(saved);
+      // ensure shape
+      if (!quizData || !Array.isArray(quizData.quizzes)) throw new Error('bad shape');
+    } catch (e) {
+      console.warn('Invalid stored quizzes, resetting to defaults.', e);
+      quizData = JSON.parse(JSON.stringify(defaultData));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+    }
+  } else {
+    quizData = JSON.parse(JSON.stringify(defaultData));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+  }
+
+  // If URL has quizId param, load that quiz
+  const urlParams = new URLSearchParams(window.location.search);
+  const quizId = urlParams.get('quizId');
+  if (quizId) {
+    const q = quizData.quizzes.find(x => x.id === quizId);
+    if (q) {
+      currentQuiz = q;
+      if (quizNameInput) quizNameInput.value = q.name || '';
+    }
+  }
+
+  // Populate UI
+  updateLevelSelect();
+  updateLevelList();
+  updateQuestionsList();
+
+  // Set up listeners (only if elements exist)
+  if (saveQuizNameBtn) saveQuizNameBtn.addEventListener('click', saveQuizName);
+  if (saveQuizBtn) saveQuizBtn.addEventListener('click', saveQuiz);
+  if (addLevelBtn) addLevelBtn.addEventListener('click', addCustomLevel);
+  if (addQuestionBtn) addQuestionBtn.addEventListener('click', addCustomQuestion);
+  if (resetQuestionsBtn) resetQuestionsBtn.addEventListener('click', resetQuestions);
+  if (modalOkBtn) modalOkBtn.addEventListener('click', () => { if (errorModal) errorModal.style.display = 'none'; });
+
+  // Media upload triggers
+  if (displayMediaUploadBtn && displayMediaUpload) displayMediaUploadBtn.addEventListener('click', () => displayMediaUpload.click());
+  if (afterMediaUploadBtn && afterMediaUpload) afterMediaUploadBtn.addEventListener('click', () => afterMediaUpload.click());
+
+  // File input change handlers (setup previews)
+  setupMediaUpload('display');
+  setupMediaUpload('after');
+}
+
+/* -------------------------
+   Utility helpers
+   ------------------------- */
+function showModal(msg) {
+  if (modalMessage) modalMessage.textContent = msg;
+  if (errorModal) errorModal.style.display = 'flex';
+}
+
+/* Safe ID/value getter (tries many names) */
+function getInputValue(...ids) {
+  const el = $id(...ids);
+  if (!el) return '';
+  return ('value' in el) ? el.value : (el.textContent || '');
+}
+
+/* Safe ID setter */
+function setInputValue(value, ...ids) {
+  const el = $id(...ids);
+  if (!el) return;
+  if ('value' in el) el.value = value;
+  else el.textContent = value;
+}
+
+/* Generate safe id from text */
+function makeId(text) {
+  return text ? text.toLowerCase().replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '') : `quiz-${Date.now()}`;
+}
+
+/* Persist quizData */
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+}
+
+/* -------------------------
+   Quiz saving / name
+   ------------------------- */
+function saveQuizName() {
+  const name = (quizNameInput && quizNameInput.value) ? quizNameInput.value.trim() : '';
+  if (!name) {
+    showModal('Please enter a quiz name.');
+    return;
+  }
+
+  // If editing existing quiz
+  if (currentQuiz) {
+    currentQuiz.name = name;
+  } else {
+    // create new quiz object
+    const id = makeId(name);
+    const newQuiz = {
+      id,
+      name,
+      levels: [],
+      questions: {}
+    };
+    quizData.quizzes.push(newQuiz);
+    currentQuiz = newQuiz;
+  }
+
+  persist();
+  updateLevelSelect();
+  updateLevelList();
+  updateQuestionsList();
+  showModal('Quiz name saved.');
+}
+
+function saveQuiz() {
+  if (!currentQuiz) {
+    showModal('No quiz loaded to save.');
+    return;
+  }
+  // update name (if changed)
+  if (quizNameInput) currentQuiz.name = quizNameInput.value || currentQuiz.name;
+  // Save to storage
+  persist();
+  showModal('Quiz saved to localStorage.');
+}
+
+/* -------------------------
+   Level management
+   ------------------------- */
+function addCustomLevel() {
+  if (!currentQuiz) {
+    showModal('Please create or open a quiz first.');
+    return;
+  }
+
+  const name = (levelNameInput && levelNameInput.value) ? levelNameInput.value.trim() : '';
+  if (!name) {
+    showModal('Please enter a level name.');
+    return;
+  }
+
+  const color1 = (levelColor1Input && levelColor1Input.value) ? levelColor1Input.value : '#6a11cb';
+  const color2 = (levelColor2Input && levelColor2Input.value) ? levelColor2Input.value : '#2575fc';
+
+  const id = makeId(name + '-' + (currentQuiz.levels.length + 1));
+  const order = currentQuiz.levels.length + 1;
+
+  const newLevel = { id, name, color1, color2, order };
+
+  currentQuiz.levels.push(newLevel);
+  // ensure questions object exists
+  if (!currentQuiz.questions) currentQuiz.questions = {};
+  currentQuiz.questions[id] = currentQuiz.questions[id] || [];
+
+  persist();
+  updateLevelSelect();
+  updateLevelList();
+  showModal('Level added.');
+}
+
+/* Renders the level <select> used by Add Question */
+function updateLevelSelect() {
+  if (!levelSelect) return;
+  // clear
+  levelSelect.innerHTML = '';
+  if (!currentQuiz || !currentQuiz.levels || currentQuiz.levels.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'No levels available';
+    levelSelect.appendChild(opt);
+    return;
+  }
+  currentQuiz.levels
+    .sort((a,b) => (a.order || 0) - (b.order || 0))
+    .forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.name;
+      levelSelect.appendChild(opt);
+    });
+}
+
+/* Renders the visual list of level cards.
+   This function binds action buttons with unique classes/data attributes
+   so Edit will not call Delete by mistake. */
+function updateLevelList() {
+  if (!levelList) return;
+  levelList.innerHTML = '';
+
+  if (!currentQuiz || !Array.isArray(currentQuiz.levels) || currentQuiz.levels.length === 0) {
+    // show empty state
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.innerHTML = '<i class="fas fa-info-circle"></i><p>No levels yet. Add one using the Level Management form.</p>';
+    levelList.appendChild(empty);
+    return;
+  }
+
+  currentQuiz.levels
+    .sort((a,b) => (a.order || 0) - (b.order || 0))
+    .forEach((lvl, idx) => {
+      const card = document.createElement('div');
+      card.className = 'level-item';
+      card.style.background = `linear-gradient(135deg, ${lvl.color1 || '#6a11cb'}, ${lvl.color2 || '#2575fc'})`;
+      card.setAttribute('data-level-id', lvl.id);
+
+      // level info area
+      const info = document.createElement('div');
+      info.className = 'level-info';
+      info.innerHTML = `
+        <div class="level-title">${lvl.name}</div>
+        <div class="level-order">Order: ${lvl.order || (idx + 1)}</div>
+        <div class="level-count">${(currentQuiz.questions && currentQuiz.questions[lvl.id]) ? currentQuiz.questions[lvl.id].length : 0} questions</div>
+      `;
+
+      // actions container
+      const actions = document.createElement('div');
+      actions.className = 'level-actions';
+
+      // up / down order buttons
+      const orderControls = document.createElement('div');
+      orderControls.className = 'level-order-controls';
+      const up = document.createElement('button');
+      up.className = 'order-btn';
+      up.title = 'Move level up';
+      up.innerHTML = '<i class="fas fa-arrow-up"></i>';
+      up.disabled = idx === 0;
+      up.addEventListener('click', (e) => { e.stopPropagation(); moveLevelUp(lvl.id); });
+
+      const down = document.createElement('button');
+      down.className = 'order-btn';
+      down.title = 'Move level down';
+      down.innerHTML = '<i class="fas fa-arrow-down"></i>';
+      down.disabled = idx === currentQuiz.levels.length - 1;
+      down.addEventListener('click', (e) => { e.stopPropagation(); moveLevelDown(lvl.id); });
+
+      orderControls.appendChild(up);
+      orderControls.appendChild(down);
+
+      // edit button (unique class .btn-edit)
+      const editBtn = document.createElement('button');
+      editBtn.className = 'level-action-btn btn-edit';
+      editBtn.title = 'Edit level';
+      editBtn.innerHTML = '<i class="fas fa-pen"></i>';
+      editBtn.addEventListener('click', (e) => { e.stopPropagation(); editLevel(lvl.id); });
+
+      // delete button (unique class .btn-delete)
+      const delBtn = document.createElement('button');
+      delBtn.className = 'level-action-btn btn-delete';
+      delBtn.title = 'Delete level';
+      delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+      delBtn.addEventListener('click', (e) => { e.stopPropagation(); 
+        if (confirm(`Delete level "${lvl.name}"? This will also remove its questions.`)) deleteLevel(lvl.id); 
+      });
+
+      actions.appendChild(orderControls);
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+
+      card.appendChild(info);
+      card.appendChild(actions);
+      levelList.appendChild(card);
+    });
+}
+
+/* Delete a level and its questions */
+function deleteLevel(levelId) {
+  if (!currentQuiz) return;
+  currentQuiz.levels = currentQuiz.levels.filter(l => l.id !== levelId);
+  if (currentQuiz.questions && currentQuiz.questions[levelId]) {
+    delete currentQuiz.questions[levelId];
+  }
+  // reorder
+  currentQuiz.levels.forEach((lvl, i) => { lvl.order = i + 1; });
+  persist();
+  updateLevelSelect();
+  updateLevelList();
+  updateQuestionsList();
+  showModal('Level deleted successfully.');
+}
+
+/* Move up/down */
+function moveLevelUp(levelId) {
+  if (!currentQuiz) return;
+  const idx = currentQuiz.levels.findIndex(l => l.id === levelId);
+  if (idx > 0) {
+    [currentQuiz.levels[idx - 1], currentQuiz.levels[idx]] = [currentQuiz.levels[idx], currentQuiz.levels[idx - 1]];
+    currentQuiz.levels.forEach((lvl, i) => { lvl.order = i + 1; });
+    persist();
+    updateLevelList();
+  }
+}
+function moveLevelDown(levelId) {
+  if (!currentQuiz) return;
+  const idx = currentQuiz.levels.findIndex(l => l.id === levelId);
+  if (idx >= 0 && idx < currentQuiz.levels.length - 1) {
+    [currentQuiz.levels[idx], currentQuiz.levels[idx + 1]] = [currentQuiz.levels[idx + 1], currentQuiz.levels[idx]];
+    currentQuiz.levels.forEach((lvl, i) => { lvl.order = i + 1; });
+    persist();
+    updateLevelList();
+  }
+}
+
+/* Edit level - populate the form so user can update then click Add Level to recreate it */
+function editLevel(levelId) {
+  if (!currentQuiz) return;
+  const lvl = currentQuiz.levels.find(l => l.id === levelId);
+  if (!lvl) return;
+  if (levelNameInput) levelNameInput.value = lvl.name || '';
+  if (levelColor1Input) levelColor1Input.value = lvl.color1 || '#6a11cb';
+  if (levelColor2Input) levelColor2Input.value = lvl.color2 || '#2575fc';
+  // Remove the old one so adding will create a new one at the end (this follows original behavior)
+  deleteLevel(levelId);
+}
+
+/* -------------------------
+   Robust resetAdminForm (replaces fragile version)
+   - safe checks (no null .value access)
+   - option to preserve media and level selection
+   ------------------------- */
+function resetAdminForm(opts = {}) {
+  const { preserveMedia = true, preserveLevel = true } = opts;
+
+  // clear question & options
+  setInputValue('', 'admin-question', 'question', 'admin-question-text', 'question-text');
+  setInputValue('', 'admin-option1', 'option1');
+  setInputValue('', 'admin-option2', 'option2');
+  setInputValue('', 'admin-option3', 'option3');
+  setInputValue('', 'admin-option4', 'option4');
+
+  // Only clear media URLs & previews if preserveMedia is false
+  if (!preserveMedia) {
+    setInputValue('', 'admin-display-media-url', 'display-media-url');
+    setInputValue('', 'admin-after-media-url', 'after-media-url');
+
+    // clear file inputs safely
+    const fileIds = ['admin-display-media-upload', 'display-media-upload', 'admin-after-media-upload', 'after-media-upload'];
+    fileIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.type === 'file') {
+        try { el.value = null; } catch (e) {}
+      }
+    });
+
+    // clear previews
+    const imgPreview = $id('display-media-preview');
+    const videoPreview = $id('display-video-preview');
+    if (imgPreview) { imgPreview.src = ''; imgPreview.style.display = 'none'; }
+    if (videoPreview) { try { videoPreview.pause && videoPreview.pause(); } catch(e){}; videoPreview.src = ''; videoPreview.style.display = 'none'; }
+
+    const imgAfter = $id('after-media-preview');
+    const vidAfter = $id('after-video-preview');
+    if (imgAfter) { imgAfter.src = ''; imgAfter.style.display = 'none'; }
+    if (vidAfter) { try { vidAfter.pause && vidAfter.pause(); } catch(e){}; vidAfter.src = ''; vidAfter.style.display = 'none'; }
+
+    // reset media type buttons (set image as default)
+    document.querySelectorAll('.media-type-btn').forEach(btn => {
+      if (btn.getAttribute('data-type') === 'image') btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+  }
+
+  // Optionally reset level selection
+  if (!preserveLevel) {
+    const lvl = $id('admin-difficulty', 'difficulty', 'level-select', 'admin-level-select');
+    if (lvl && 'value' in lvl) lvl.value = '';
+  }
+
+  // Update UI lists if present
+  if (typeof updateQuestionsList === 'function') {
+    try { updateQuestionsList(); } catch (e) { console.warn('updateQuestionsList error', e); }
+  }
+  if (typeof updateLevelList === 'function') {
+    try { updateLevelList(); } catch (e) { console.warn('updateLevelList error', e); }
+  }
+}
+
+/* -------------------------
+   Add question (robust replacement)
+   - uses safe lookups
+   - doesn't crash on missing elements
+   - preserves media by default
+   ------------------------- */
+function addCustomQuestion() {
+  if (!currentQuiz) {
+    showModal('Please create or open a quiz first.');
+    return;
+  }
+
+  // determine levelId (try multiple elements)
+  const levelId = getInputValue('admin-difficulty', 'admin-level-select', 'difficulty', 'level-select');
+  if (!levelId) {
+    showModal('Please select a level to add the question to.');
+    return;
+  }
+
+  // get question & options robustly
+  const questionText = getInputValue('admin-question', 'question', 'admin-question-text', 'question-text').trim();
+  const option1 = getInputValue('admin-option1', 'option1').trim();
+  const option2 = getInputValue('admin-option2', 'option2').trim();
+  const option3 = getInputValue('admin-option3', 'option3').trim();
+  const option4 = getInputValue('admin-option4', 'option4').trim();
+
+  if (!questionText) { showModal('Please enter the question text.'); return; }
+  if (!option1 || !option2 || !option3 || !option4) { showModal('Please fill all four options (option1 is treated as correct).'); return; }
+
+  // find active media-type button helper
+  function activeMediaType(forName) {
+    const btn = Array.from(document.querySelectorAll('.media-type-btn')).find(b => (b.getAttribute('data-for') === forName || b.dataset.for === forName) && b.classList.contains('active'));
+    return btn ? (btn.getAttribute('data-type') || btn.dataset.type) : 'image';
+  }
+
+  const displayMediaType = activeMediaType('display');
+  const afterMediaType = activeMediaType('after');
+
+  // get media URLs (try admin- prefixed and plain ids)
+  const displayMediaUrl = getInputValue('admin-display-media-url', 'display-media-url').trim();
+  const afterMediaUrl = getInputValue('admin-after-media-url', 'after-media-url').trim();
+
+  // Build the question object
+  const newQuestion = {
+    question: questionText,
+    options: [option1, option2, option3, option4],
+    correct: 0,
+    displayMedia: displayMediaUrl ? { type: displayMediaType, url: displayMediaUrl } : null,
+    afterMedia: afterMediaUrl ? { type: afterMediaType, url: afterMediaUrl } : null
+  };
+
+  // Ensure structure
+  if (!currentQuiz.questions) currentQuiz.questions = {};
+  if (!currentQuiz.questions[levelId]) currentQuiz.questions[levelId] = [];
+  currentQuiz.questions[levelId].push(newQuestion);
+
+  // persist
+  persist();
+
+  // Reset only question/options (preserve media & level by default)
+  resetAdminForm({ preserveMedia: true, preserveLevel: true });
+
+  // update UI
+  updateLevelList();
+  updateQuestionsList();
+
+  showModal('Question added to level! The correct answer will be randomly positioned.');
+}
+
+/* -------------------------
+   NEW: LEVEL-WISE QUESTIONS RENDER + edit/delete per question
+   - Groups questions by level
+   - Shows level header with gradient (color1→color2)
+   - Each question has edit/delete buttons
+   ------------------------- */
+function updateQuestionsList() {
+  if (!questionsList) return;
+  questionsList.innerHTML = '';
+
+  if (!currentQuiz) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.innerHTML = '<i class="fas fa-question-circle"></i><p>No quiz loaded.</p>';
+    questionsList.appendChild(empty);
+    return;
+  }
+
+  // if no levels or no questions at all
+  if (!Array.isArray(currentQuiz.levels) || currentQuiz.levels.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.innerHTML = '<i class="fas fa-info-circle"></i><p>No levels available. Add a level first.</p>';
+    questionsList.appendChild(empty);
+    return;
+  }
+
+  // For each level, render header and its questions
+  currentQuiz.levels
+    .sort((a,b) => (a.order || 0) - (b.order || 0))
+    .forEach(lvl => {
+      // Level container
+      const lvlWrap = document.createElement('div');
+      lvlWrap.className = 'questions-level-wrap';
+      lvlWrap.style.marginBottom = '18px';
+      lvlWrap.style.borderRadius = '8px';
+      lvlWrap.style.overflow = 'hidden';
+      lvlWrap.style.boxShadow = '0 1px 0 rgba(0,0,0,0.03)';
+
+      // Level header with gradient background and name
+      const hdr = document.createElement('div');
+      hdr.className = 'questions-level-header';
+      hdr.style.padding = '10px 12px';
+      hdr.style.color = '#fff';
+      hdr.style.fontWeight = '700';
+      hdr.style.display = 'flex';
+      hdr.style.justifyContent = 'space-between';
+      hdr.style.alignItems = 'center';
+      hdr.style.background = `linear-gradient(135deg, ${lvl.color1 || '#6a11cb'}, ${lvl.color2 || '#2575fc'})`;
+
+      const hdrLeft = document.createElement('div');
+      hdrLeft.innerHTML = `<div style="font-size:1rem">${lvl.name}</div><div style="font-size:0.85rem;opacity:0.95">Order: ${lvl.order || ''} • ${(currentQuiz.questions && currentQuiz.questions[lvl.id]) ? currentQuiz.questions[lvl.id].length : 0} questions</div>`;
+
+      hdr.appendChild(hdrLeft);
+
+      // optional quick actions per level (e.g., delete all questions for this level)
+      const hdrActions = document.createElement('div');
+      hdrActions.style.display = 'flex';
+      hdrActions.style.gap = '8px';
+      // add a "Clear level" small button
+      const clearBtn = document.createElement('button');
+      clearBtn.className = 'level-action-btn btn-delete';
+      clearBtn.title = 'Clear all questions in this level';
+      clearBtn.style.background = 'rgba(255,255,255,0.12)';
+      clearBtn.innerHTML = '<i class="fas fa-trash"></i>';
+      clearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!confirm(`Delete all questions in level "${lvl.name}"?`)) return;
+        if (currentQuiz.questions && currentQuiz.questions[lvl.id]) {
+          currentQuiz.questions[lvl.id] = [];
+          persist();
+          updateLevelList();
+          updateQuestionsList();
+          showModal(`All questions in "${lvl.name}" removed.`);
+        }
+      });
+      hdrActions.appendChild(clearBtn);
+      hdr.appendChild(hdrActions);
+
+      lvlWrap.appendChild(hdr);
+
+      // Questions list for this level
+      const qArr = (currentQuiz.questions && currentQuiz.questions[lvl.id]) ? currentQuiz.questions[lvl.id] : [];
+      const qList = document.createElement('ul');
+      qList.className = 'level-question-list';
+      qList.style.listStyle = 'none';
+      qList.style.margin = '0';
+      qList.style.padding = '8px 12px';
+      qList.style.background = '#fafafa';
+
+      if (!qArr || qArr.length === 0) {
+        const emptyLi = document.createElement('li');
+        emptyLi.style.padding = '8px 0';
+        emptyLi.style.color = '#666';
+        emptyLi.textContent = 'No questions in this level yet.';
+        qList.appendChild(emptyLi);
+      } else {
+        qArr.forEach((q, idx) => {
+          const li = document.createElement('li');
+          li.style.display = 'flex';
+          li.style.justifyContent = 'space-between';
+          li.style.alignItems = 'center';
+          li.style.padding = '8px 0';
+          li.style.borderBottom = '1px solid rgba(0,0,0,0.04)';
+
+          const left = document.createElement('div');
+          left.style.flex = '1';
+          left.style.paddingRight = '8px';
+          left.style.color = '#222';
+          left.innerHTML = `<strong style="color:#333">Q${idx+1}.</strong> ${escapeHtml(q.question || '')}`;
+
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.gap = '8px';
+          right.style.alignItems = 'center';
+
+          const editBtn = document.createElement('button');
+          editBtn.className = 'question-edit-btn';
+          editBtn.title = 'Edit question';
+          editBtn.style.border = 'none';
+          editBtn.style.background = 'rgba(0,123,255,0.08)';
+          editBtn.style.color = '#055a9a';
+          editBtn.style.padding = '6px 8px';
+          editBtn.style.borderRadius = '6px';
+          editBtn.innerHTML = '<i class="fas fa-pen"></i>';
+          editBtn.addEventListener('click', (e) => { e.stopPropagation(); editQuestion(lvl.id, idx); });
+
+          const delBtn = document.createElement('button');
+          delBtn.className = 'question-delete-btn';
+          delBtn.title = 'Delete question';
+          delBtn.style.border = 'none';
+          delBtn.style.background = 'rgba(255,0,0,0.06)';
+          delBtn.style.color = '#a00';
+          delBtn.style.padding = '6px 8px';
+          delBtn.style.borderRadius = '6px';
+          delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+          delBtn.addEventListener('click', (e) => { e.stopPropagation(); 
+            if (!confirm('Delete this question?')) return;
+            deleteQuestion(lvl.id, idx);
+          });
+
+          right.appendChild(editBtn);
+          right.appendChild(delBtn);
+
+          li.appendChild(left);
+          li.appendChild(right);
+          qList.appendChild(li);
+        });
+      }
+
+      lvlWrap.appendChild(qList);
+      questionsList.appendChild(lvlWrap);
+    });
+}
+
+/* escapeHtml helper for safe innerHTML */
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"'`=\/]/g, function(s) {
+    return ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;','`':'&#96;','/':'&#47;','=':'&#61;'
+    })[s];
+  });
+}
+
+/* Edit a question: populate the form with question data for editing */
+function editQuestion(levelId, index) {
+  if (!currentQuiz || !currentQuiz.questions || !currentQuiz.questions[levelId]) {
+    showModal('Question not found.');
+    return;
+  }
+  const q = currentQuiz.questions[levelId][index];
+  if (!q) { showModal('Question not found.'); return; }
+
+  // Populate form fields safely
+  setInputValue(q.question || '', 'admin-question', 'question', 'admin-question-text', 'question-text');
+
+  const opts = q.options || [];
+  setInputValue(opts[0] || '', 'admin-option1', 'option1');
+  setInputValue(opts[1] || '', 'admin-option2', 'option2');
+  setInputValue(opts[2] || '', 'admin-option3', 'option3');
+  setInputValue(opts[3] || '', 'admin-option4', 'option4');
+
+  // Set selected level in the level select so user knows where it's from
+  const lvlSel = $id('admin-difficulty', 'admin-level-select', 'difficulty', 'level-select');
+  if (lvlSel && 'value' in lvlSel) lvlSel.value = levelId;
+
+  // media
+  if (q.displayMedia && q.displayMedia.url) {
+    setInputValue(q.displayMedia.url, 'admin-display-media-url', 'display-media-url');
+    // set media-type btn active
+    document.querySelectorAll('.media-type-btn').forEach(b => {
+      const forAttr = b.getAttribute('data-for') || b.dataset.for;
+      const typeAttr = b.getAttribute('data-type') || b.dataset.type;
+      if (forAttr === 'display') {
+        if (typeAttr === (q.displayMedia.type || 'image')) b.classList.add('active');
+        else b.classList.remove('active');
+      }
+    });
+    // trigger preview via manual event if url input exists
+    const urlEl = $id('admin-display-media-url','display-media-url');
+    if (urlEl) urlEl.dispatchEvent(new Event('input'));
+  } else {
+    // if no display media, leave as-is (do not clear to preserve)
+  }
+
+  if (q.afterMedia && q.afterMedia.url) {
+    setInputValue(q.afterMedia.url, 'admin-after-media-url', 'after-media-url');
+    document.querySelectorAll('.media-type-btn').forEach(b => {
+      const forAttr = b.getAttribute('data-for') || b.dataset.for;
+      const typeAttr = b.getAttribute('data-type') || b.dataset.type;
+      if (forAttr === 'after') {
+        if (typeAttr === (q.afterMedia.type || 'image')) b.classList.add('active');
+        else b.classList.remove('active');
+      }
+    });
+    const urlEl2 = $id('admin-after-media-url','after-media-url');
+    if (urlEl2) urlEl2.dispatchEvent(new Event('input'));
+  }
+
+  // Now remove the question from the list (we will re-add on save) to allow editing-in-place
+  // But instead of removing, mark an "editing" state so addCustomQuestion will replace rather than append.
+  // Simpler approach: store an edit marker on the form in window.editingQuestion = { levelId, index }
+  window.editingQuestion = { levelId, index };
+
+  // Show a small hint (you can change Save flow if you'd prefer)
+  showModal('Question loaded into the editor. Edit fields and click "Add Question" to save changes (it will replace the original).');
+
+  // Optionally remove the original question right away to avoid duplicates when saving:
+  // (we'll remove here and then when user clicks Add Question it will push new one)
+  currentQuiz.questions[levelId].splice(index, 1);
+  persist();
+  updateLevelList();
+  updateQuestionsList();
+}
+
+/* Delete a single question */
+function deleteQuestion(levelId, index) {
+  if (!currentQuiz || !currentQuiz.questions || !currentQuiz.questions[levelId]) return;
+  currentQuiz.questions[levelId].splice(index, 1);
+  persist();
+  updateLevelList();
+  updateQuestionsList();
+  showModal('Question deleted.');
+}
+
+/* -------------------------
+   Reset all questions in current quiz
+   ------------------------- */
+function resetQuestions() {
+  if (!currentQuiz) { showModal('No quiz selected.'); return; }
+  if (!confirm('Are you sure you want to reset all questions in this quiz? This cannot be undone.')) return;
+  currentQuiz.questions = {};
+  persist();
+  updateLevelList();
+  updateQuestionsList();
+  showModal('All questions have been reset!');
+}
+
+/* -------------------------
+   Media upload & preview helpers
+   ------------------------- */
+function setupMediaUpload(section) {
+  // expected IDs
+  const fileId = section === 'display' ? 'display-media-upload' : 'after-media-upload';
+  const urlId = section === 'display' ? 'display-media-url' : 'after-media-url';
+  const imgPreviewId = section === 'display' ? 'display-media-preview' : 'after-media-preview';
+  const videoPreviewId = section === 'display' ? 'display-video-preview' : 'after-video-preview';
+  const fileEl = $id('admin-' + fileId, fileId);
+  const urlEl = $id('admin-' + urlId, urlId);
+  const imgPreview = $id(imgPreviewId);
+  const videoPreview = $id(videoPreviewId);
+
+  if (fileEl) {
+    fileEl.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const url = URL.createObjectURL(f);
+      // decide by mime type
+      if (f.type && f.type.startsWith('video')) {
+        if (videoPreview) { videoPreview.src = url; videoPreview.style.display = ''; }
+        if (imgPreview) imgPreview.style.display = 'none';
+        // set url field to object URL (optional)
+        if (urlEl && 'value' in urlEl) urlEl.value = url;
+      } else {
+        if (imgPreview) { imgPreview.src = url; imgPreview.style.display = ''; }
+        if (videoPreview) videoPreview.style.display = 'none';
+        if (urlEl && 'value' in urlEl) urlEl.value = url;
+      }
+    });
+  }
+
+  if (urlEl) {
+    urlEl.addEventListener('input', (e) => {
+      const v = e.target.value.trim();
+      if (!v) {
+        if (imgPreview) imgPreview.style.display = 'none';
+        if (videoPreview) videoPreview.style.display = 'none';
+        return;
+      }
+      // Heuristic: if url ends with common video extensions or contains "youtube", treat as video
+      const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(v) || /youtube\.com|youtu\.be|vimeo\.com/i.test(v);
+      if (isVideo) {
+        if (videoPreview) { videoPreview.src = v; videoPreview.style.display = ''; }
+        if (imgPreview) imgPreview.style.display = 'none';
+      } else {
+        if (imgPreview) { imgPreview.src = v; imgPreview.style.display = ''; }
+        if (videoPreview) { try { videoPreview.pause && videoPreview.pause(); } catch(e){}; videoPreview.style.display = 'none'; }
+      }
+    });
+  }
+}
+
+/* -------------------------
+   If Add Question is used while editing (window.editingQuestion set),
+   we should replace the removed question rather than append duplicate.
+   The current addCustomQuestion implementation appends; to support editing,
+   we check for window.editingQuestion and if present, push to that level and clear the marker.
+   ------------------------- */
+// We already splice out the question in editQuestion; when addCustomQuestion runs it simply pushes newQuestion.
+// After pushing, clear editing marker if present.
+const originalAddCustomQuestion = addCustomQuestion;
+/* (we cannot easily overwrite earlier function reference because addCustomQuestion already defined above,
+   so to integrate editing flow, update addCustomQuestion to check window.editingQuestion - we already build newQuestion
+   and push to currentQuiz.questions[levelId] which works. To ensure we clear the editing flag after push, add the line below in addCustomQuestion:
+*/
+// Note: addCustomQuestion above ends by pushing and persist; add the following cleanup:
+(function attachEditingCleanup() {
+  // monkey-patch: wrap current addCustomQuestion
+  const prev = addCustomQuestion;
+  addCustomQuestion = function() {
+    // call original
+    prev();
+    // after original has run, if editingQuestion exists, clear it
+    if (window.editingQuestion) {
+      // editingQuestion was already used to remove old question; now remove marker
+      window.editingQuestion = null;
+    }
+  };
+})();
+
+/* -------------------------
+   Init on load
+   ------------------------- */
+initAdmin();
+
+/* ---------- REPLACE your current updateQuestionsList with this ---------- */
+function updateQuestionsList() {
+  if (!questionsList) return;
+  questionsList.innerHTML = '';
+
+  if (!currentQuiz) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.innerHTML = '<i class="fas fa-question-circle"></i><p>No quiz loaded.</p>';
+    questionsList.appendChild(empty);
+    return;
+  }
+
+  if (!Array.isArray(currentQuiz.levels) || currentQuiz.levels.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.innerHTML = '<i class="fas fa-info-circle"></i><p>No levels available. Add a level first.</p>';
+    questionsList.appendChild(empty);
+    return;
+  }
+
+  currentQuiz.levels
+    .sort((a,b) => (a.order || 0) - (b.order || 0))
+    .forEach(lvl => {
+      const lvlWrap = document.createElement('div');
+      lvlWrap.className = 'questions-level-wrap';
+      lvlWrap.style.marginBottom = '18px';
+      lvlWrap.style.borderRadius = '10px';
+      lvlWrap.style.overflow = 'hidden';
+      lvlWrap.style.boxShadow = '0 1px 0 rgba(0,0,0,0.04)';
+
+      const hdr = document.createElement('div');
+      hdr.className = 'questions-level-header';
+      hdr.style.padding = '10px 12px';
+      hdr.style.color = '#fff';
+      hdr.style.fontWeight = '700';
+      hdr.style.display = 'flex';
+      hdr.style.justifyContent = 'space-between';
+      hdr.style.alignItems = 'center';
+      hdr.style.background = `linear-gradient(135deg, ${lvl.color1 || '#6a11cb'}, ${lvl.color2 || '#2575fc'})`;
+      hdr.innerHTML = `
+        <div>
+          <div style="font-size:1rem">${lvl.name}</div>
+          <div style="font-size:0.85rem;opacity:0.95">Order: ${lvl.order || ''} • ${(currentQuiz.questions && currentQuiz.questions[lvl.id]) ? currentQuiz.questions[lvl.id].length : 0} questions</div>
+        </div>
+      `;
+      lvlWrap.appendChild(hdr);
+
+      const qArr = (currentQuiz.questions && currentQuiz.questions[lvl.id]) ? currentQuiz.questions[lvl.id] : [];
+      const qList = document.createElement('ul');
+      qList.className = 'level-question-list';
+      qList.style.listStyle = 'none';
+      qList.style.margin = '0';
+      qList.style.padding = '8px 12px';
+      qList.style.background = '#fafafa';
+
+      if (!qArr || qArr.length === 0) {
+        const emptyLi = document.createElement('li');
+        emptyLi.style.padding = '8px 0';
+        emptyLi.style.color = '#666';
+        emptyLi.textContent = 'No questions in this level yet.';
+        qList.appendChild(emptyLi);
+      } else {
+        qArr.forEach((q, idx) => {
+          const li = document.createElement('li');
+          li.style.display = 'block';
+          li.style.padding = '8px 0';
+          li.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+          li.dataset.levelId = lvl.id;
+          li.dataset.qIndex = idx;
+
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.justifyContent = 'space-between';
+          row.style.alignItems = 'center';
+
+          const left = document.createElement('div');
+          left.style.flex = '1';
+          left.style.paddingRight = '8px';
+          left.style.color = '#222';
+          left.innerHTML = `<strong style="color:#333">Q${idx+1}.</strong> ${escapeHtml(q.question || '')}`;
+
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.gap = '8px';
+          right.style.alignItems = 'center';
+
+          const editBtn = document.createElement('button');
+          editBtn.className = 'question-edit-btn';
+          editBtn.title = 'Edit question';
+          editBtn.style.border = 'none';
+          editBtn.style.background = 'rgba(0,123,255,0.08)';
+          editBtn.style.color = '#055a9a';
+          editBtn.style.padding = '6px 8px';
+          editBtn.style.borderRadius = '6px';
+          editBtn.innerHTML = '<i class="fas fa-pen"></i>';
+          editBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            inlineEditQuestion(li, lvl.id, idx);
+          });
+
+          const delBtn = document.createElement('button');
+          delBtn.className = 'question-delete-btn';
+          delBtn.title = 'Delete question';
+          delBtn.style.border = 'none';
+          delBtn.style.background = 'rgba(255,0,0,0.06)';
+          delBtn.style.color = '#a00';
+          delBtn.style.padding = '6px 8px';
+          delBtn.style.borderRadius = '6px';
+          delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+          delBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!confirm('Delete this question?')) return;
+            deleteQuestion(lvl.id, idx);
+          });
+
+          right.appendChild(editBtn);
+          right.appendChild(delBtn);
+
+          row.appendChild(left);
+          row.appendChild(right);
+
+          const editorHost = document.createElement('div');
+          editorHost.className = 'inline-editor-host';
+          editorHost.style.display = 'none';
+
+          li.appendChild(row);
+          li.appendChild(editorHost);
+          qList.appendChild(li);
+        });
+      }
+
+      lvlWrap.appendChild(qList);
+      questionsList.appendChild(lvlWrap);
+    });
+}
+
+/* ---------- NEW: inline edit helpers (ADD these) ---------- */
+function inlineEditQuestion(li, levelId, index) {
+  // close any other open inline editors
+  closeAllInlineEditors();
+
+  const host = li.querySelector('.inline-editor-host');
+  if (!host) return;
+
+  const q = (currentQuiz && currentQuiz.questions && currentQuiz.questions[levelId])
+    ? currentQuiz.questions[levelId][index]
+    : null;
+  if (!q) return;
+
+  host.innerHTML = '';
+  host.appendChild(buildInlineEditor(levelId, index, q));
+  host.style.display = 'block';
+}
+
+function buildInlineEditor(levelId, index, q) {
+  const wrap = document.createElement('div');
+  wrap.className = 'inline-editor';
+  wrap.style.marginTop = '10px';
+  wrap.style.padding = '12px';
+  wrap.style.borderRadius = '8px';
+  wrap.style.border = '1px solid rgba(0,0,0,0.08)';
+  wrap.style.background = '#fff';
+  wrap.style.boxShadow = '0 1px 2px rgba(0,0,0,0.04)';
+
+  const displayType = (q.displayMedia && q.displayMedia.type) || 'image';
+  const displayUrl  = (q.displayMedia && q.displayMedia.url)  || '';
+  const afterType   = (q.afterMedia && q.afterMedia.type)     || 'image';
+  const afterUrl    = (q.afterMedia && q.afterMedia.url)      || '';
+
+  wrap.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr;gap:10px">
+      <label style="font-weight:600">Question
+        <textarea class="ie-question" style="width:100%;min-height:60px;padding:8px;border:1px solid #dcdcdc;border-radius:6px">${escapeHtml(q.question || '')}</textarea>
+      </label>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <label>Option 1 (correct)
+          <input class="ie-opt1" type="text" value="${escapeHtml(q.options?.[0] || '')}" style="width:100%;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+        </label>
+        <label>Option 2
+          <input class="ie-opt2" type="text" value="${escapeHtml(q.options?.[1] || '')}" style="width:100%;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+        </label>
+        <label>Option 3
+          <input class="ie-opt3" type="text" value="${escapeHtml(q.options?.[2] || '')}" style="width:100%;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+        </label>
+        <label>Option 4
+          <input class="ie-opt4" type="text" value="${escapeHtml(q.options?.[3] || '')}" style="width:100%;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+        </label>
+      </div>
+
+      <label>Correct answer
+        <select class="ie-correct" style="width:100%;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+          <option value="0"${(q.correct ?? 0) === 0 ? ' selected':''}>Option 1</option>
+          <option value="1"${(q.correct ?? 0) === 1 ? ' selected':''}>Option 2</option>
+          <option value="2"${(q.correct ?? 0) === 2 ? ' selected':''}>Option 3</option>
+          <option value="3"${(q.correct ?? 0) === 3 ? ' selected':''}>Option 4</option>
+        </select>
+      </label>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
+        <div>
+          <div style="font-weight:600;margin-bottom:6px">Before-answer media</div>
+          <div style="display:flex;gap:8px;margin-bottom:6px">
+            <select class="ie-display-type" style="flex:0 0 120px;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+              <option value="image"${displayType==='image'?' selected':''}>Image</option>
+              <option value="video"${displayType==='video'?' selected':''}>Video</option>
+            </select>
+            <input class="ie-display-url" type="text" placeholder="https://…" value="${escapeHtml(displayUrl)}" style="flex:1;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+          </div>
+          <div class="ie-display-preview"></div>
+        </div>
+
+        <div>
+          <div style="font-weight:600;margin-bottom:6px">After-answer media</div>
+          <div style="display:flex;gap:8px;margin-bottom:6px">
+            <select class="ie-after-type" style="flex:0 0 120px;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+              <option value="image"${afterType==='image'?' selected':''}>Image</option>
+              <option value="video"${afterType==='video'?' selected':''}>Video</option>
+            </select>
+            <input class="ie-after-url" type="text" placeholder="https://…" value="${escapeHtml(afterUrl)}" style="flex:1;padding:8px;border:1px solid #dcdcdc;border-radius:6px">
+          </div>
+          <div class="ie-after-preview"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+        <button class="ie-cancel" style="padding:8px 12px;border-radius:6px;border:1px solid #e3e3e3;background:#f6f6f6">Cancel</button>
+        <button class="ie-save"   style="padding:8px 12px;border-radius:6px;border:1px solid #0a6cff;background:#0a6cff;color:#fff">Save</button>
+      </div>
+    </div>
+  `;
+
+  // wire preview handlers
+  wireInlinePreview(wrap.querySelector('.ie-display-url'), wrap.querySelector('.ie-display-type'), wrap.querySelector('.ie-display-preview'));
+  wireInlinePreview(wrap.querySelector('.ie-after-url'), wrap.querySelector('.ie-after-type'), wrap.querySelector('.ie-after-preview'));
+
+  wrap.querySelector('.ie-cancel').addEventListener('click', (e) => {
+    e.preventDefault();
+    cancelInlineEdit(wrap);
+  });
+
+  wrap.querySelector('.ie-save').addEventListener('click', (e) => {
+    e.preventDefault();
+    saveInlineEdit(levelId, index, wrap);
+  });
+
+  // trigger initial previews
+  const dUrl = wrap.querySelector('.ie-display-url').value.trim();
+  const aUrl = wrap.querySelector('.ie-after-url').value.trim();
+  if (dUrl) wrap.querySelector('.ie-display-url').dispatchEvent(new Event('input'));
+  if (aUrl) wrap.querySelector('.ie-after-url').dispatchEvent(new Event('input'));
+
+  return wrap;
+}
+
+function wireInlinePreview(urlInput, typeSelect, previewHost) {
+  if (!urlInput || !typeSelect || !previewHost) return;
+  function render() {
+    const url = urlInput.value.trim();
+    const type = typeSelect.value;
+    previewHost.innerHTML = '';
+    if (!url) return;
+    if (type === 'video' || /\.(mp4|webm|ogg)(\?|$)/i.test(url) || /youtube\.com|youtu\.be|vimeo\.com/i.test(url)) {
+      const vid = document.createElement('video');
+      vid.controls = true;
+      vid.src = url;
+      vid.style.maxWidth = '100%';
+      vid.style.borderRadius = '6px';
+      previewHost.appendChild(vid);
+    } else {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'preview';
+      img.style.maxWidth = '100%';
+      img.style.borderRadius = '6px';
+      previewHost.appendChild(img);
+    }
+  }
+  urlInput.addEventListener('input', render);
+  typeSelect.addEventListener('change', render);
+}
+
+function saveInlineEdit(levelId, index, wrap) {
+  if (!currentQuiz || !currentQuiz.questions || !currentQuiz.questions[levelId]) return;
+
+  const q = currentQuiz.questions[levelId][index];
+  if (!q) return;
+
+  const qText = (wrap.querySelector('.ie-question')?.value || '').trim();
+  const o1 = (wrap.querySelector('.ie-opt1')?.value || '').trim();
+  const o2 = (wrap.querySelector('.ie-opt2')?.value || '').trim();
+  const o3 = (wrap.querySelector('.ie-opt3')?.value || '').trim();
+  const o4 = (wrap.querySelector('.ie-opt4')?.value || '').trim();
+  const correct = parseInt(wrap.querySelector('.ie-correct')?.value ?? '0', 10) || 0;
+
+  if (!qText || !o1 || !o2 || !o3 || !o4) {
+    showModal('Please fill the question and all 4 options.');
+    return;
+  }
+
+  const dType = wrap.querySelector('.ie-display-type')?.value || 'image';
+  const dUrl  = (wrap.querySelector('.ie-display-url')?.value || '').trim();
+  const aType = wrap.querySelector('.ie-after-type')?.value || 'image';
+  const aUrl  = (wrap.querySelector('.ie-after-url')?.value || '').trim();
+
+  q.question = qText;
+  q.options = [o1,o2,o3,o4];
+  q.correct = Math.max(0, Math.min(3, correct));
+  q.displayMedia = dUrl ? { type: dType, url: dUrl } : null;
+  q.afterMedia   = aUrl ? { type: aType, url: aUrl } : null;
+
+  persist();
+  updateQuestionsList();
+  showModal('Question updated.');
+}
+
+function cancelInlineEdit(wrap) {
+  const host = wrap.parentElement;
+  if (host) host.style.display = 'none';
+  wrap.remove();
+}
+
+function closeAllInlineEditors() {
+  document.querySelectorAll('.inline-editor-host').forEach(h => {
+    h.innerHTML = '';
+    h.style.display = 'none';
+  });
+}
+
+</script>
+
+
 </body>
 </html>
