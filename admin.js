@@ -8,10 +8,7 @@ const defaultData = {
 
 // DOM elements
 const quizNameInput = document.getElementById('quiz-name');
-const saveQuizNameBtn = document.getElementById('save-quiz-name-btn');
-const currentQuizInfo = document.getElementById('current-quiz-info');
-const currentQuizName = document.getElementById('current-quiz-name');
-const currentQuizId = document.getElementById('current-quiz-id');
+const saveQuizBtn = document.getElementById('save-quiz-btn');
 const levelSelect = document.getElementById('admin-difficulty');
 const levelNameInput = document.getElementById('level-name');
 const levelColor1Input = document.getElementById('level-color1');
@@ -20,21 +17,10 @@ const addLevelBtn = document.getElementById('add-level-btn');
 const levelList = document.getElementById('level-list');
 const addQuestionBtn = document.getElementById('add-question-btn');
 const resetQuestionsBtn = document.getElementById('reset-questions-btn');
-const viewQuestionsBtn = document.getElementById('view-questions-btn');
+const questionsList = document.getElementById('questions-list');
 const errorModal = document.getElementById('error-modal');
 const modalMessage = document.getElementById('modal-message');
 const modalOkBtn = document.getElementById('modal-ok-btn');
-const questionsList = document.getElementById('questions-list');
-const questionEditorModal = document.getElementById('question-editor-modal');
-const editQuestionInput = document.getElementById('edit-question');
-const editOption1Input = document.getElementById('edit-option1');
-const editOption2Input = document.getElementById('edit-option2');
-const editOption3Input = document.getElementById('edit-option3');
-const editOption4Input = document.getElementById('edit-option4');
-const editDisplayMediaUrl = document.getElementById('edit-display-media-url');
-const editAfterMediaUrl = document.getElementById('edit-after-media-url');
-const editQuestionCancelBtn = document.getElementById('edit-question-cancel-btn');
-const editQuestionSaveBtn = document.getElementById('edit-question-save-btn');
 
 // Quiz data
 let quizData = {};
@@ -48,7 +34,26 @@ function initAdmin() {
     // Load quizzes from localStorage or use defaults
     const savedData = localStorage.getItem(STORAGE_KEY);
     if (savedData) {
-        quizData = JSON.parse(savedData);
+        try {
+            quizData = JSON.parse(savedData);
+            
+            // Ensure backward compatibility with old data structure
+            if (!quizData.quizzes) {
+                quizData = {
+                    quizzes: quizData.levels ? [{ 
+                        id: 'default-quiz', 
+                        name: 'My Quiz', 
+                        levels: quizData.levels, 
+                        questions: quizData.questions 
+                    }] : []
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+            }
+        } catch (e) {
+            console.error("Error parsing saved data:", e);
+            quizData = JSON.parse(JSON.stringify(defaultData));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+        }
     } else {
         quizData = JSON.parse(JSON.stringify(defaultData));
         localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
@@ -63,10 +68,6 @@ function initAdmin() {
         if (quiz) {
             currentQuiz = quiz;
             quizNameInput.value = quiz.name;
-            currentQuizName.textContent = quiz.name;
-            currentQuizId.textContent = quiz.id;
-            currentQuizInfo.style.display = 'block';
-            
             updateLevelSelect();
             updateLevelList();
             updateQuestionsList();
@@ -74,10 +75,9 @@ function initAdmin() {
     }
 
     // Event listeners
-    saveQuizNameBtn.addEventListener('click', saveQuizName);
+    saveQuizBtn.addEventListener('click', saveQuiz);
     addQuestionBtn.addEventListener('click', addCustomQuestion);
     resetQuestionsBtn.addEventListener('click', resetQuestions);
-    viewQuestionsBtn.addEventListener('click', viewQuestions);
     modalOkBtn.addEventListener('click', () => {
         errorModal.style.display = 'none';
     });
@@ -88,8 +88,6 @@ function initAdmin() {
     // Media upload previews
     setupMediaUpload('display');
     setupMediaUpload('after');
-    setupMediaUpload('edit-display');
-    setupMediaUpload('edit-after');
     
     // Media type selector
     document.querySelectorAll('.media-type-btn').forEach(btn => {
@@ -103,37 +101,28 @@ function initAdmin() {
             this.classList.add('active');
             
             // Update preview visibility
-            if (forSection === 'display' || forSection === 'edit-display') {
-                const previewPrefix = forSection === 'edit-display' ? 'edit-' : '';
+            if (forSection === 'display') {
                 if (type === 'image') {
-                    document.getElementById(`${previewPrefix}display-media-preview`).style.display = 'block';
-                    document.getElementById(`${previewPrefix}display-video-preview`).style.display = 'none';
+                    document.getElementById('display-media-preview').style.display = 'block';
+                    document.getElementById('display-video-preview').style.display = 'none';
                 } else {
-                    document.getElementById(`${previewPrefix}display-media-preview`).style.display = 'none';
-                    document.getElementById(`${previewPrefix}display-video-preview`).style.display = 'block';
+                    document.getElementById('display-media-preview').style.display = 'none';
+                    document.getElementById('display-video-preview').style.display = 'block';
                 }
             } else {
-                const previewPrefix = forSection === 'edit-after' ? 'edit-' : '';
                 if (type === 'image') {
-                    document.getElementById(`${previewPrefix}after-media-preview`).style.display = 'block';
-                    document.getElementById(`${previewPrefix}after-video-preview`).style.display = 'none';
+                    document.getElementById('after-media-preview').style.display = 'block';
+                    document.getElementById('after-video-preview').style.display = 'none';
                 } else {
-                    document.getElementById(`${previewPrefix}after-media-preview`).style.display = 'none';
-                    document.getElementById(`${previewPrefix}after-video-preview`).style.display = 'block';
+                    document.getElementById('after-media-preview').style.display = 'none';
+                    document.getElementById('after-video-preview').style.display = 'block';
                 }
             }
         });
     });
-    
-    // Question editor
-    editQuestionCancelBtn.addEventListener('click', () => {
-        questionEditorModal.style.display = 'none';
-    });
-    
-    editQuestionSaveBtn.addEventListener('click', saveEditedQuestion);
 }
 
-function saveQuizName() {
+function saveQuiz() {
     const name = quizNameInput.value.trim();
     
     if (!name) {
@@ -141,38 +130,32 @@ function saveQuizName() {
         return;
     }
     
-    // Create a simple ID for the quiz
-    const id = name.toLowerCase().replace(/\s+/g, '-');
-    
-    // Check if quiz with this name already exists
-    const existingQuiz = quizData.quizzes.find(q => q.id === id);
-    
-    if (existingQuiz) {
-        // Use existing quiz
-        currentQuiz = existingQuiz;
-    } else {
+    if (!currentQuiz) {
         // Create new quiz
+        const id = name.toLowerCase().replace(/\s+/g, '-');
+        
         currentQuiz = {
             id,
             name,
             levels: [],
             questions: {}
         };
+        
         quizData.quizzes.push(currentQuiz);
+    } else {
+        // Update existing quiz
+        currentQuiz.name = name;
     }
     
     // Save to localStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
     
-    // Update UI
-    currentQuizName.textContent = currentQuiz.name;
-    currentQuizId.textContent = currentQuiz.id;
-    currentQuizInfo.style.display = 'block';
+    showModal(`Quiz "${name}" saved successfully!`);
     
-    updateLevelSelect();
-    updateLevelList();
-    
-    showModal(`Quiz "${name}" ${existingQuiz ? 'loaded' : 'created'} successfully!`);
+    // Redirect back to main page after a short delay
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1500);
 }
 
 function updateLevelSelect() {
@@ -204,7 +187,8 @@ function updateLevelList() {
         levelItem.classList.add('level-item');
         levelItem.style.background = `linear-gradient(to right, ${level.color1}, ${level.color2})`;
         
-        const questionCount = currentQuiz.questions[level.id] ? currentQuiz.questions[level.id].length : 0;
+        const questionCount = currentQuiz.questions && currentQuiz.questions[level.id] ? 
+            currentQuiz.questions[level.id].length : 0;
         
         levelItem.innerHTML = `
             <div>
@@ -272,7 +256,7 @@ function updateQuestionsList() {
     let hasQuestions = false;
     
     for (const level of currentQuiz.levels) {
-        if (currentQuiz.questions[level.id] && currentQuiz.questions[level.id].length > 0) {
+        if (currentQuiz.questions && currentQuiz.questions[level.id] && currentQuiz.questions[level.id].length > 0) {
             hasQuestions = true;
             
             const levelHeader = document.createElement('h3');
@@ -307,7 +291,12 @@ function updateQuestionsList() {
     }
     
     if (!hasQuestions) {
-        questionsList.innerHTML = '<p>No questions added yet. Add questions using the form above.</p>';
+        questionsList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-question-circle"></i>
+                <p>No questions added yet. Add questions using the form above.</p>
+            </div>
+        `;
     } else {
         // Add event listeners to edit and delete buttons
         document.querySelectorAll('.edit-question-btn').forEach(btn => {
@@ -326,152 +315,6 @@ function updateQuestionsList() {
             });
         });
     }
-}
-
-function editQuestion(levelId, index) {
-    if (!currentQuiz.questions[levelId] || !currentQuiz.questions[levelId][index]) {
-        showModal("Question not found!");
-        return;
-    }
-    
-    const question = currentQuiz.questions[levelId][index];
-    
-    // Fill the edit form with question data
-    editQuestionInput.value = question.question;
-    editOption1Input.value = question.options[0];
-    editOption2Input.value = question.options[1];
-    editOption3Input.value = question.options[2];
-    editOption4Input.value = question.options[3];
-    
-    // Set media URLs
-    if (question.displayMedia && question.displayMedia.url) {
-        editDisplayMediaUrl.value = question.displayMedia.url;
-        
-        // Set preview
-        if (question.displayMedia.type === 'image') {
-            document.getElementById('edit-display-media-preview').src = question.displayMedia.url;
-            document.getElementById('edit-display-media-preview').style.display = 'block';
-            document.getElementById('edit-display-video-preview').style.display = 'none';
-            document.querySelector('.media-type-btn[data-for="edit-display"][data-type="image"]').classList.add('active');
-            document.querySelector('.media-type-btn[data-for="edit-display"][data-type="video"]').classList.remove('active');
-        } else {
-            document.getElementById('edit-display-video-preview').src = question.displayMedia.url;
-            document.getElementById('edit-display-video-preview').style.display = 'block';
-            document.getElementById('edit-display-media-preview').style.display = 'none';
-            document.querySelector('.media-type-btn[data-for="edit-display"][data-type="video"]').classList.add('active');
-            document.querySelector('.media-type-btn[data-for="edit-display"][data-type="image"]').classList.remove('active');
-        }
-    } else {
-        editDisplayMediaUrl.value = '';
-        document.getElementById('edit-display-media-preview').style.display = 'none';
-        document.getElementById('edit-display-video-preview').style.display = 'none';
-    }
-    
-    if (question.afterMedia && question.afterMedia.url) {
-        editAfterMediaUrl.value = question.afterMedia.url;
-        
-        // Set preview
-        if (question.afterMedia.type === 'image') {
-            document.getElementById('edit-after-media-preview').src = question.afterMedia.url;
-            document.getElementById('edit-after-media-preview').style.display = 'block';
-            document.getElementById('edit-after-video-preview').style.display = 'none';
-            document.querySelector('.media-type-btn[data-for="edit-after"][data-type="image"]').classList.add('active');
-            document.querySelector('.media-type-btn[data-for="edit-after"][data-type="video"]').classList.remove('active');
-        } else {
-            document.getElementById('edit-after-video-preview').src = question.afterMedia.url;
-            document.getElementById('edit-after-video-preview').style.display = 'block';
-            document.getElementById('edit-after-media-preview').style.display = 'none';
-            document.querySelector('.media-type-btn[data-for="edit-after"][data-type="video"]').classList.add('active');
-            document.querySelector('.media-type-btn[data-for="edit-after"][data-type="image"]').classList.remove('active');
-        }
-    } else {
-        editAfterMediaUrl.value = '';
-        document.getElementById('edit-after-media-preview').style.display = 'none';
-        document.getElementById('edit-after-video-preview').style.display = 'none';
-    }
-    
-    // Store editing context
-    currentEditingQuestion = question;
-    currentEditingLevelId = levelId;
-    currentEditingQuestionIndex = index;
-    
-    // Show the editor modal
-    questionEditorModal.style.display = 'flex';
-}
-
-function saveEditedQuestion() {
-    if (!currentEditingQuestion || !currentEditingLevelId || currentEditingQuestionIndex === null) {
-        showModal("No question to save!");
-        return;
-    }
-    
-    const questionText = editQuestionInput.value;
-    const option1 = editOption1Input.value;
-    const option2 = editOption2Input.value;
-    const option3 = editOption3Input.value;
-    const option4 = editOption4Input.value;
-    
-    // Get display media type and URL
-    const displayMediaType = document.querySelector('.media-type-btn[data-for="edit-display"].active').getAttribute('data-type');
-    const displayMediaUrl = editDisplayMediaUrl.value;
-    
-    // Get after-answer media type and URL
-    const afterMediaType = document.querySelector('.media-type-btn[data-for="edit-after"].active').getAttribute('data-type');
-    const afterMediaUrl = editAfterMediaUrl.value;
-
-    // Validate inputs
-    if (!questionText || !option1 || !option2 || !option3 || !option4) {
-        showModal("Please fill in all question and answer fields!");
-        return;
-    }
-
-    // Update the question
-    currentEditingQuestion.question = questionText;
-    currentEditingQuestion.options = [option1, option2, option3, option4];
-    
-    currentEditingQuestion.displayMedia = displayMediaUrl ? {
-        type: displayMediaType,
-        url: displayMediaUrl
-    } : null;
-    
-    currentEditingQuestion.afterMedia = afterMediaUrl ? {
-        type: afterMediaType,
-        url: afterMediaUrl
-    } : null;
-
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
-
-    // Update UI
-    updateQuestionsList();
-    
-    // Close the modal
-    questionEditorModal.style.display = 'none';
-    
-    showModal("Question updated successfully!");
-}
-
-function deleteQuestion(levelId, index) {
-    if (!confirm("Are you sure you want to delete this question?")) {
-        return;
-    }
-    
-    if (!currentQuiz.questions[levelId] || !currentQuiz.questions[levelId][index]) {
-        showModal("Question not found!");
-        return;
-    }
-    
-    // Remove the question
-    currentQuiz.questions[levelId].splice(index, 1);
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
-    
-    // Update UI
-    updateQuestionsList();
-    updateLevelList();
-    
-    showModal("Question deleted successfully!");
 }
 
 function showModal(message) {
@@ -576,6 +419,9 @@ function addCustomLevel() {
     });
     
     // Initialize empty questions array for this level
+    if (!currentQuiz.questions) {
+        currentQuiz.questions = {};
+    }
     if (!currentQuiz.questions[id]) {
         currentQuiz.questions[id] = [];
     }
@@ -602,7 +448,9 @@ function deleteLevel(levelId) {
     currentQuiz.levels = currentQuiz.levels.filter(level => level.id !== levelId);
     
     // Remove questions for this level
-    delete currentQuiz.questions[levelId];
+    if (currentQuiz.questions) {
+        delete currentQuiz.questions[levelId];
+    }
     
     // Reorder remaining levels
     currentQuiz.levels.forEach((level, index) => {
@@ -752,6 +600,9 @@ function addCustomQuestion() {
     };
 
     // Add to questions
+    if (!currentQuiz.questions) {
+        currentQuiz.questions = {};
+    }
     if (!currentQuiz.questions[levelId]) {
         currentQuiz.questions[levelId] = [];
     }
@@ -781,34 +632,6 @@ function resetQuestions() {
         
         showModal("All questions have been reset!");
     }
-}
-
-function viewQuestions() {
-    if (!currentQuiz) {
-        showModal("Please create a quiz first!");
-        return;
-    }
-    
-    let message = `Questions in "${currentQuiz.name}":\n\n`;
-    
-    for (const levelId in currentQuiz.questions) {
-        const level = currentQuiz.levels.find(l => l.id === levelId);
-        const levelName = level ? level.name : levelId;
-        
-        message += `--- ${levelName.toUpperCase()} (${currentQuiz.questions[levelId].length} questions) ---\n`;
-        
-        if (currentQuiz.questions[levelId].length === 0) {
-            message += "No questions yet\n\n";
-        } else {
-            currentQuiz.questions[levelId].forEach((q, i) =>{
-                message += `${i+1}. ${q.question}\n`;
-                message += `   Correct Answer: ${q.options[0]}\n\n`;
-            });
-            message += "\n";
-        }
-    }
-    
-    alert(message);
 }
 
 // Initialize the admin panel
