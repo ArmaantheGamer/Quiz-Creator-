@@ -325,12 +325,43 @@ function initAdmin() {
   // If URL has quizId param, load that quiz
   const urlParams = new URLSearchParams(window.location.search);
   const quizId = urlParams.get('quizId');
+  const isEditMode = urlParams.get('edit') === 'true';
+  
   if (quizId) {
     const q = quizData.quizzes.find(x => x.id === quizId);
     if (q) {
       currentQuiz = q;
       if (quizNameInput) quizNameInput.value = q.name || '';
     }
+  }
+
+  // Check if we're in edit mode
+  if (isEditMode && currentQuiz) {
+    // Update UI for edit mode
+    const titleElement = document.querySelector('.creator-header h1');
+    if (titleElement) {
+      titleElement.textContent = 'Edit Your Quiz';
+    }
+    
+    const subtitleElement = document.querySelector('.creator-header p');
+    if (subtitleElement) {
+      subtitleElement.textContent = 'Modify your quiz levels and questions';
+    }
+    
+    // Change button text
+    const saveButton = document.getElementById('save-quiz-btn');
+    if (saveButton) {
+      saveButton.innerHTML = '<i class="fas fa-save"></i> Update Quiz';
+      saveButton.style.background = 'linear-gradient(to bottom, #ff8c00, #ff6b00)';
+    }
+    
+    // Add edit mode indicator
+    const editIndicator = document.createElement('div');
+    editIndicator.className = 'edit-mode-indicator';
+    editIndicator.innerHTML = '<i class="fas fa-edit"></i> Editing Mode';
+    document.querySelector('.quiz-creator').insertBefore(editIndicator, document.querySelector('.creator-header'));
+    
+    showModal('Now editing: ' + currentQuiz.name, 'info');
   }
 
   // Populate UI
@@ -340,7 +371,18 @@ function initAdmin() {
 
   // Set up listeners (only if elements exist)
   if (saveQuizNameBtn) saveQuizNameBtn.addEventListener('click', saveQuizName);
-  if (saveQuizBtn) saveQuizBtn.addEventListener('click', saveQuiz);
+  if (saveQuizBtn) {
+    saveQuizBtn.addEventListener('click', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isEditMode = urlParams.get('edit') === 'true';
+      
+      if (isEditMode) {
+        updateQuiz();
+      } else {
+        saveQuiz();
+      }
+    });
+  }
   if (addLevelBtn) addLevelBtn.addEventListener('click', addCustomLevel);
   if (addQuestionBtn) addQuestionBtn.addEventListener('click', addCustomQuestion);
   if (resetQuestionsBtn) resetQuestionsBtn.addEventListener('click', resetQuestions);
@@ -447,15 +489,42 @@ function saveQuizName() {
 }
 
 function saveQuiz() {
-  if (!currentQuiz) {
-    showModal('No quiz loaded to save.', 'error');
-    return;
-  }
-  // update name (if changed)
-  if (quizNameInput) currentQuiz.name = quizNameInput.value || currentQuiz.name;
-  // Save to storage
-  persist();
-  showModal('Quiz saved to localStorage.', 'success');
+    const urlParams = new URLSearchParams(window.location.search);
+    const isEditMode = urlParams.get('edit') === 'true';
+    
+    if (isEditMode) {
+        updateQuiz();
+    } else {
+        // Original save quiz code
+        const name = (quizNameInput && quizNameInput.value) ? quizNameInput.value.trim() : '';
+        
+        if (!name) {
+            showModal('Please enter a quiz name.', 'error');
+            return;
+        }
+
+        // If editing existing quiz
+        if (currentQuiz) {
+            currentQuiz.name = name;
+        } else {
+            // create new quiz object
+            const id = makeId(name);
+            const newQuiz = {
+                id,
+                name,
+                levels: [],
+                questions: {}
+            };
+            quizData.quizzes.push(newQuiz);
+            currentQuiz = newQuiz;
+        }
+
+        persist();
+        updateLevelSelect();
+        updateLevelList();
+        updateQuestionsList();
+        showModal('Quiz saved successfully!', 'success');
+    }
 }
 
 /* -------------------------
@@ -597,6 +666,27 @@ function updateLevelList() {
     });
 }
 
+function updateQuiz() {
+  if (!currentQuiz) {
+    showModal('No quiz selected for update.', 'error');
+    return;
+  }
+  
+  // Update name if changed
+  if (quizNameInput) {
+    currentQuiz.name = quizNameInput.value.trim() || currentQuiz.name;
+  }
+  
+  // Save to storage
+  persist();
+  
+  // Show success message and redirect back
+  showModal('Quiz updated successfully!', 'success');
+  
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 1500);
+}
 /* Delete a level and its questions */
 function deleteLevel(levelId) {
   if (!currentQuiz) return;
