@@ -247,12 +247,12 @@
 
     <!-- Modal for error messages -->
     <div class="modal" id="error-modal">
-        <div class="modal-content">
-            <h2><i class="fas fa-exclamation-circle"></i> Oops!</h2>
-            <p id="modal-message">Please create some questions first.</p>
-            <button class="modal-btn" id="modal-ok-btn">OK</button>
-        </div>
+    <div class="modal-content">
+        <h2 id="modal-title"><i class="fas fa-exclamation-circle"></i> Oops!</h2>
+        <p id="modal-message">Please create some questions first.</p>
+        <button class="modal-btn" id="modal-ok-btn">OK</button>
     </div>
+</div>
 
 <script>
 /* ===========================
@@ -358,9 +358,33 @@ function initAdmin() {
 /* -------------------------
    Utility helpers
    ------------------------- */
-function showModal(msg) {
+function showModal(msg, type = 'error') {
   if (modalMessage) modalMessage.textContent = msg;
   if (errorModal) errorModal.style.display = 'flex';
+  
+  const modalTitle = document.getElementById('modal-title');
+  if (modalTitle) {
+    let icon = 'fa-exclamation-circle';
+    let titleText = 'Error!';
+    switch(type) {
+      case 'success':
+        icon = 'fa-check-circle';
+        titleText = 'Success!';
+        break;
+      case 'warning':
+        icon = 'fa-exclamation-triangle';
+        titleText = 'Warning!';
+        break;
+      case 'info':
+        icon = 'fa-info-circle';
+        titleText = 'Info';
+        break;
+      default:
+        icon = 'fa-exclamation-circle';
+        titleText = 'Error!';
+    }
+    modalTitle.innerHTML = `<i class="fas ${icon}"></i> ${titleText}`;
+  }
 }
 
 /* Safe ID/value getter (tries many names) */
@@ -394,7 +418,8 @@ function persist() {
 function saveQuizName() {
   const name = (quizNameInput && quizNameInput.value) ? quizNameInput.value.trim() : '';
   if (!name) {
-    showModal('Please enter a quiz name.');
+    showModal('Please enter a quiz name.', 'error');
+
     return;
   }
 
@@ -418,19 +443,19 @@ function saveQuizName() {
   updateLevelSelect();
   updateLevelList();
   updateQuestionsList();
-  showModal('Quiz name saved.');
+  showModal('Quiz name saved.', 'success');
 }
 
 function saveQuiz() {
   if (!currentQuiz) {
-    showModal('No quiz loaded to save.');
+    showModal('No quiz loaded to save.', 'error');
     return;
   }
   // update name (if changed)
   if (quizNameInput) currentQuiz.name = quizNameInput.value || currentQuiz.name;
   // Save to storage
   persist();
-  showModal('Quiz saved to localStorage.');
+  showModal('Quiz saved to localStorage.', 'success');
 }
 
 /* -------------------------
@@ -438,13 +463,13 @@ function saveQuiz() {
    ------------------------- */
 function addCustomLevel() {
   if (!currentQuiz) {
-    showModal('Please create or open a quiz first.');
+    showModal('Please create or open a quiz first.', 'error');
     return;
   }
 
   const name = (levelNameInput && levelNameInput.value) ? levelNameInput.value.trim() : '';
   if (!name) {
-    showModal('Please enter a level name.');
+    showModal('Please enter a level name.', 'error');
     return;
   }
 
@@ -464,7 +489,7 @@ function addCustomLevel() {
   persist();
   updateLevelSelect();
   updateLevelList();
-  showModal('Level added.');
+  showModal('Level added.', 'success');
 }
 
 /* Renders the level <select> used by Add Question */
@@ -585,7 +610,7 @@ function deleteLevel(levelId) {
   updateLevelSelect();
   updateLevelList();
   updateQuestionsList();
-  showModal('Level deleted successfully.');
+  showModal('Level deleted successfully.', 'success');
 }
 
 /* Move up/down */
@@ -750,7 +775,7 @@ function addCustomQuestion() {
   updateLevelList();
   updateQuestionsList();
 
-  showModal('Question added to level! The correct answer will be randomly positioned.');
+  showModal('Question added to level! The correct answer will be randomly positioned.', 'success');
 }
 
 /* -------------------------
@@ -979,7 +1004,7 @@ function editQuestion(levelId, index) {
   window.editingQuestion = { levelId, index };
 
   // Show a small hint (you can change Save flow if you'd prefer)
-  showModal('Question loaded into the editor. Edit fields and click "Add Question" to save changes (it will replace the original).');
+  showModal('Question loaded into the editor. Edit fields and click "Add Question" to save changes (it will replace the original).', 'info');
 
   // Optionally remove the original question right away to avoid duplicates when saving:
   // (we'll remove here and then when user clicks Add Question it will push new one)
@@ -996,7 +1021,7 @@ function deleteQuestion(levelId, index) {
   persist();
   updateLevelList();
   updateQuestionsList();
-  showModal('Question deleted.');
+  showModal('Question deleted.', 'success');
 }
 
 /* -------------------------
@@ -1009,7 +1034,7 @@ function resetQuestions() {
   persist();
   updateLevelList();
   updateQuestionsList();
-  showModal('All questions have been reset!');
+  showModal('All questions have been reset!', 'success');
 }
 
 /* -------------------------
@@ -1413,7 +1438,7 @@ function saveInlineEdit(levelId, index, wrap) {
 
   persist();
   updateQuestionsList();
-  showModal('Question updated.');
+  showModal('Question updated.', 'success');
 }
 
 function cancelInlineEdit(wrap) {
