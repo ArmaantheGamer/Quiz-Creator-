@@ -317,9 +317,33 @@ function updateQuestionsList() {
     }
 }
 
-function showModal(message) {
+function showModal(message, type = 'error') {
     modalMessage.textContent = message;
     errorModal.style.display = 'flex';
+    
+    const modalTitle = document.getElementById('modal-title');
+    if (modalTitle) {
+        let icon = 'fa-exclamation-circle';
+        let titleText = 'Error!';
+        switch(type) {
+            case 'success':
+                icon = 'fa-check-circle';
+                titleText = 'Success!';
+                break;
+            case 'warning':
+                icon = 'fa-exclamation-triangle';
+                titleText = 'Warning!';
+                break;
+            case 'info':
+                icon = 'fa-info-circle';
+                titleText = 'Info';
+                break;
+            default:
+                icon = 'fa-exclamation-circle';
+                titleText = 'Error!';
+        }
+        modalTitle.innerHTML = `<i class="fas ${icon}"></i> ${titleText}`;
+    }
 }
 
 function setupMediaUpload(section) {
@@ -383,7 +407,7 @@ function setupMediaUpload(section) {
 
 function addCustomLevel() {
     if (!currentQuiz) {
-        showModal("Please create a quiz first!");
+        showModal("Please create a quiz first!", 'error');
         return;
     }
     
@@ -392,7 +416,7 @@ function addCustomLevel() {
     const color2 = levelColor2Input.value;
     
     if (!name) {
-        showModal("Please enter a level name!");
+        showModal("Please enter a level name!", 'error');
         return;
     }
     
@@ -401,7 +425,7 @@ function addCustomLevel() {
     
     // Check if level with this name already exists
     if (currentQuiz.levels.some(level => level.id === id)) {
-        showModal("A level with this name already exists in this quiz!");
+        showModal("A level with this name already exists!", 'error');
         return;
     }
     
@@ -436,7 +460,7 @@ function addCustomLevel() {
     // Reset form
     levelNameInput.value = '';
     
-    showModal(`Level "${name}" created successfully!`);
+    showModal(`Level "${name}" created successfully!`, 'success');
 }
 
 function deleteLevel(levelId) {
@@ -465,7 +489,7 @@ function deleteLevel(levelId) {
     updateLevelList();
     updateQuestionsList();
     
-    showModal("Level deleted successfully!");
+    showModal("Level deleted successfully!", 'success');
 }
 
 function moveLevelUp(levelId) {
@@ -554,7 +578,7 @@ function resetAdminForm() {
 
 function addCustomQuestion() {
     if (!currentQuiz) {
-        showModal("Please create a quiz first!");
+        showModal("Please create a quiz first!", 'error');
         return;
     }
     
@@ -575,12 +599,12 @@ function addCustomQuestion() {
 
     // Validate inputs
     if (!levelId) {
-        showModal("Please select a level first!");
+        showModal("Please select a level first!", 'error');
         return;
     }
     
     if (!questionText || !option1 || !option2 || !option3 || !option4) {
-        showModal("Please fill in all question and answer fields!");
+        showModal("Please fill in all question and answer fields!", 'error');
         return;
     }
 
@@ -618,7 +642,7 @@ function addCustomQuestion() {
     updateLevelList();
     updateQuestionsList();
     
-    showModal(`Question added to level! The correct answer will be randomly positioned.`);
+    showModal(`Question added to level! The correct answer will be randomly positioned.`, 'success');
 }
 
 function resetQuestions() {
@@ -630,7 +654,7 @@ function resetQuestions() {
         updateLevelList();
         updateQuestionsList();
         
-        showModal("All questions have been reset!");
+        showModal("All questions have been reset!", 'success');
     }
 }
 
