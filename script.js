@@ -53,6 +53,7 @@ let userAnswers = [];
 let quizData = {};
 let questionShuffleMap = {};
 let activeMediaElements = [];
+let lastPlayedQuizId = ''; // Track the last played quiz
 
 // Initialize the quiz
 function initQuiz() {
@@ -200,6 +201,7 @@ function updateLevelButtons() {
         } else {
             button.addEventListener('click', () => {
                 currentLevelId = level.id;
+                lastPlayedQuizId = level.id; // Store the last played quiz
                 startQuiz();
             });
         }
@@ -282,9 +284,33 @@ function updateStartMessage() {
     }
 }
 
-function showModal(message) {
+function showModal(message, type = 'error') {
     modalMessage.textContent = message;
     errorModal.style.display = 'flex';
+    
+    const modalTitle = document.getElementById('modal-title');
+    if (modalTitle) {
+        let icon = 'fa-exclamation-circle';
+        let titleText = 'Error!';
+        switch(type) {
+            case 'success':
+                icon = 'fa-check-circle';
+                titleText = 'Success!';
+                break;
+            case 'warning':
+                icon = 'fa-exclamation-triangle';
+                titleText = 'Warning!';
+                break;
+            case 'info':
+                icon = 'fa-info-circle';
+                titleText = 'Info';
+                break;
+            default:
+                icon = 'fa-exclamation-circle';
+                titleText = 'Error!';
+        }
+        modalTitle.innerHTML = `<i class="fas ${icon}"></i> ${titleText}`;
+    }
 }
 
 function setupMediaUpload(section) {
@@ -350,12 +376,12 @@ function addCustomLevel() {
     const color2 = levelColor2Input.value;
     
     if (!name) {
-        showModal("Please enter a level name!");
+        showModal("Please enter a level name!", 'error');
         return;
     }
     
     if (quizData.levels.length >= 5) {
-        showModal("You can only create up to 5 levels!");
+        showModal("You can only create up to 5 levels!", 'error');
         return;
     }
     
@@ -364,7 +390,7 @@ function addCustomLevel() {
     
     // Check if level with this name already exists
     if (quizData.levels.some(level => level.id === id)) {
-        showModal("A level with this name already exists!");
+        showModal("A level with this name already exists!", 'error');
         return;
     }
     
@@ -392,7 +418,7 @@ function addCustomLevel() {
     // Reset form
     levelNameInput.value = '';
     
-    showModal(`Level "${name}" created successfully!`);
+    showModal(`Level "${name}" created successfully!`, 'success');
 }
 
 function deleteLevel(levelId) {
@@ -414,7 +440,7 @@ function deleteLevel(levelId) {
     updateLevelSelect();
     updateLevelList();
     
-    showModal("Level deleted successfully!");
+    showModal("Level deleted successfully!", 'success');
 }
 
 function editLevel(levelId) {
@@ -434,7 +460,7 @@ function editLevel(levelId) {
 function startQuiz() {
     // Double-check that we have questions
     if (!quizData.questions[currentLevelId] || quizData.questions[currentLevelId].length === 0) {
-        showModal("No questions available for this level. Please add questions first.");
+        showModal("No questions available for this level. Please add questions first.", 'error');
         return;
     }
     
@@ -464,7 +490,7 @@ function startQuiz() {
 function showQuestion() {
     // Check if we have questions
     if (currentQuestions.length === 0 || currentQuestionIndex >= currentQuestions.length) {
-        showModal("No questions available or invalid question index.");
+        showModal("No questions available or invalid question index.", 'error');
         return;
     }
     
@@ -604,7 +630,7 @@ prevButton.addEventListener('click', () => {
 
 nextButton.addEventListener('click', () => {
     if (userAnswers[currentQuestionIndex] === null) {
-        showModal("Please select an answer before proceeding!");
+        showModal("Please select an answer before proceeding!", 'error');
         return;
     }
     
@@ -642,14 +668,42 @@ function finishQuiz() {
     }
     
     resultMessageElement.textContent = message;
+    
+    // Create a container for the buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.flexDirection = 'column';
+    buttonContainer.style.alignItems = 'center';
+    buttonContainer.style.gap = '15px';
+    buttonContainer.style.marginTop = '30px';
+    
+    // Create Play Again button
+    const playAgainBtn = document.createElement('button');
+    playAgainBtn.className = 'play-again';
+    playAgainBtn.innerHTML = '<i class="fas fa-redo"></i> Play Again';
+    playAgainBtn.addEventListener('click', () => {
+        resultContainer.style.display = 'none';
+        startQuiz();
+    });
+    
+    // Create Main Menu button
+    const mainMenuBtn = document.createElement('button');
+    mainMenuBtn.className = 'play-again';
+    mainMenuBtn.innerHTML = '<i class="fas fa-home"></i> Main Menu';
+    mainMenuBtn.addEventListener('click', () => {
+        resultContainer.style.display = 'none';
+        startScreen.style.display = 'block';
+        // Clear the shuffle map when going to main menu
+        questionShuffleMap = {};
+    });
+    
+    // Add buttons to container
+    buttonContainer.appendChild(playAgainBtn);
+    buttonContainer.appendChild(mainMenuBtn);
+    
+    // Add container to result container
+    resultContainer.appendChild(buttonContainer);
 }
-
-playAgainButton.addEventListener('click', () => {
-    resultContainer.style.display = 'none';
-    startScreen.style.display = 'block';
-    // Clear the shuffle map when playing again
-    questionShuffleMap = {};
-});
 
 function resetAdminForm() {
     // Reset all form fields
@@ -701,12 +755,12 @@ function addCustomQuestion() {
 
     // Validate inputs
     if (!levelId) {
-        showModal("Please select a level first!");
+        showModal("Please select a level first!", 'error');
         return;
     }
     
     if (!questionText || !option1 || !option2 || !option3 || !option4) {
-        showModal("Please fill in all question and answer fields!");
+        showModal("Please fill in all question and answer fields!", 'error');
         return;
     }
 
@@ -742,7 +796,7 @@ function addCustomQuestion() {
     updateLevelList();
     updateStartMessage();
     
-    showModal(`Question added to level! The correct answer will be randomly positioned.`);
+    showModal(`Question added to level! The correct answer will be randomly positioned.`, 'success');
 }
 
 function resetQuestions() {
@@ -755,7 +809,7 @@ function resetQuestions() {
         updateLevelList();
         updateStartMessage();
         
-        showModal("All questions have been reset!");
+        showModal("All questions have been reset!", 'success');
     }
 }
 
@@ -818,13 +872,13 @@ function importQuizData(event) {
                     updateLevelList();
                     updateStartMessage();
                     
-                    showModal("Quiz data imported successfully!");
+                    showModal("Quiz data imported successfully!", 'success');
                 }
             } else {
-                showModal("Invalid quiz data format. Please import a valid JSON file.");
+                showModal("Invalid quiz data format. Please import a valid JSON file.", 'error');
             }
         } catch (error) {
-            showModal("Error parsing JSON file. Please make sure it's a valid quiz data file.");
+            showModal("Error parsing JSON file. Please make sure it's a valid quiz data file.", 'error');
         }
     };
     reader.readAsText(file);
@@ -835,7 +889,7 @@ function importQuizData(event) {
 
 // Helper function to convert hex color to RGB
 function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    const result = /^#?([a-f\d]{2})([a-f\d][2])([a-f\d][2])$/i.exec(hex);
     return result ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
