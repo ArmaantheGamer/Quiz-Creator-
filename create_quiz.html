@@ -392,9 +392,37 @@ function initAdmin() {
   if (displayMediaUploadBtn && displayMediaUpload) displayMediaUploadBtn.addEventListener('click', () => displayMediaUpload.click());
   if (afterMediaUploadBtn && afterMediaUpload) afterMediaUploadBtn.addEventListener('click', () => afterMediaUpload.click());
 
+
   // File input change handlers (setup previews)
   setupMediaUpload('display');
   setupMediaUpload('after');
+  // ----------------------
+// Media type toggle handlers
+// Ensures Image/Video buttons show the correct preview element
+// Place this EXACTLY beneath the two setupMediaUpload(...) calls
+document.querySelectorAll('.media-type-btn').forEach(btn => {
+  btn.addEventListener('click', (ev) => {
+    const type = btn.getAttribute('data-type') || btn.dataset.type;
+    const forName = btn.getAttribute('data-for') || btn.dataset.for; // 'display' or 'after'
+    if (!forName) return;
+
+    // deactivate siblings for the same 'for' group
+    document.querySelectorAll(`.media-type-btn[data-for="${forName}"]`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const img = document.getElementById(`${forName}-media-preview`);
+    const vid = document.getElementById(`${forName}-video-preview`);
+
+    if (type === 'image') {
+      if (img) img.style.display = (img.src ? 'block' : 'none');
+      if (vid) { try { vid.pause(); } catch(e){}; vid.style.display = 'none'; /* keep src intact until new file/url set */ }
+    } else if (type === 'video') {
+      if (vid) vid.style.display = (vid.src ? 'block' : 'none');
+      if (img) img.style.display = 'none';
+    }
+  });
+});
+
 }
 
 /* -------------------------
@@ -780,6 +808,19 @@ function resetAdminForm(opts = {}) {
     // reset media type buttons (set image as default)
     document.querySelectorAll('.media-type-btn').forEach(btn => {
       if (btn.getAttribute('data-type') === 'image') btn.classList.add('active');
+      // Toggle preview elements based on media type
+if (btn.dataset.type === 'image') {
+    const img = document.getElementById(btn.dataset.target + '-media-preview');
+    const vid = document.getElementById(btn.dataset.target + '-video-preview');
+    if (img) img.style.display = 'block';
+    if (vid) vid.style.display = 'none';
+} else if (btn.dataset.type === 'video') {
+    const img = document.getElementById(btn.dataset.target + '-media-preview');
+    const vid = document.getElementById(btn.dataset.target + '-video-preview');
+    if (img) img.style.display = 'none';
+    if (vid) vid.style.display = 'block';
+}
+
       else btn.classList.remove('active');
     });
   }
@@ -1136,50 +1177,72 @@ function setupMediaUpload(section) {
   const urlId = section === 'display' ? 'display-media-url' : 'after-media-url';
   const imgPreviewId = section === 'display' ? 'display-media-preview' : 'after-media-preview';
   const videoPreviewId = section === 'display' ? 'display-video-preview' : 'after-video-preview';
+
+  // support both admin- prefixed inputs and regular ones
   const fileEl = $id('admin-' + fileId, fileId);
   const urlEl = $id('admin-' + urlId, urlId);
   const imgPreview = $id(imgPreviewId);
   const videoPreview = $id(videoPreviewId);
+
+  // helper to hide/show previews
+  const showImagePreview = (src) => {
+    if (imgPreview) {
+      imgPreview.src = src || '';
+      imgPreview.style.display = src ? 'block' : 'none';
+    }
+    if (videoPreview) {
+      try { videoPreview.pause(); } catch (e) {}
+      if (videoPreview) { videoPreview.style.display = 'none'; videoPreview.src = ''; }
+    }
+  };
+  const showVideoPreview = (src) => {
+    if (videoPreview) {
+      videoPreview.src = src || '';
+      videoPreview.style.display = src ? 'block' : 'none';
+      try { videoPreview.load(); videoPreview.currentTime = 0; } catch(e){}
+    }
+    if (imgPreview) imgPreview.style.display = 'none';
+  };
 
   if (fileEl) {
     fileEl.addEventListener('change', (e) => {
       const f = e.target.files && e.target.files[0];
       if (!f) return;
       const url = URL.createObjectURL(f);
+
       // decide by mime type
       if (f.type && f.type.startsWith('video')) {
-        if (videoPreview) { videoPreview.src = url; videoPreview.style.display = ''; }
-        if (imgPreview) imgPreview.style.display = 'none';
-        // set url field to object URL (optional)
-        if (urlEl && 'value' in urlEl) urlEl.value = url;
+        // show video preview
+        showVideoPreview(url);
       } else {
-        if (imgPreview) { imgPreview.src = url; imgPreview.style.display = ''; }
-        if (videoPreview) videoPreview.style.display = 'none';
-        if (urlEl && 'value' in urlEl) urlEl.value = url;
+        // show image preview
+        showImagePreview(url);
       }
+
+      // set url field to object URL (optional)
+      if (urlEl && 'value' in urlEl) urlEl.value = url;
     });
   }
 
   if (urlEl) {
     urlEl.addEventListener('input', (e) => {
-      const v = e.target.value.trim();
+      const v = (e.target.value || '').trim();
       if (!v) {
         if (imgPreview) imgPreview.style.display = 'none';
         if (videoPreview) videoPreview.style.display = 'none';
         return;
       }
-      // Heuristic: if url ends with common video extensions or contains "youtube", treat as video
+      // Heuristic: if url ends with common video extensions or contains "youtube/vimeo", treat as video
       const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(v) || /youtube\.com|youtu\.be|vimeo\.com/i.test(v);
       if (isVideo) {
-        if (videoPreview) { videoPreview.src = v; videoPreview.style.display = ''; }
-        if (imgPreview) imgPreview.style.display = 'none';
+        showVideoPreview(v);
       } else {
-        if (imgPreview) { imgPreview.src = v; imgPreview.style.display = ''; }
-        if (videoPreview) { try { videoPreview.pause && videoPreview.pause(); } catch(e){}; videoPreview.style.display = 'none'; }
+        showImagePreview(v);
       }
     });
   }
 }
+
 
 /* -------------------------
    If Add Question is used while editing (window.editingQuestion set),
