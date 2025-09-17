@@ -1700,8 +1700,8 @@ mainMenuBtn.addEventListener('click', () => {
                     renameModal.style.display = 'flex';
                     break;
                 case 'edit':
-                    // For now, just show a message
-                    showModal("Edit functionality will be implemented in the full version");
+                    // Redirect to the edit page with the quiz ID
+                    window.location.href = `create_quiz.html?quizId=${quizId}&edit=true`;
                     break;
                 case 'export':
                     exportQuiz(quiz);
