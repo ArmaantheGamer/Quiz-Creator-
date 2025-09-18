@@ -1185,6 +1185,96 @@
   min-width: 48px;
   text-align: center;
 }
+.video-unmute-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 9999;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+.video-wrapper {
+  max-width: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.video-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.video-play-btn {
+  background: rgba(0,0,0,0.65);
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  padding: 12px 16px;
+  border-radius: 50%;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  cursor: pointer;
+}
+.video-play-btn:focus {
+  outline: none;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+/* Make after-answer media behave nicely: constrain video size and keep Next visible */
+.video-wrapper {
+  width: 100%;
+  max-width: 720px;      /* keeps video from getting full-screen wide */
+  margin: 12px auto;     /* center it and leave space for buttons */
+  box-sizing: border-box;
+}
+
+/* Constrain the video element so it never grows taller than the viewport */
+.video-wrapper video {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;      /* video will be at most 60% of viewport height */
+  object-fit: contain;   /* maintain aspect ratio, show black bars if needed */
+  display: block;
+}
+
+/* Ensure the after-media container can scroll if content gets tall,
+   and center things vertically / horizontally nicely */
+#after-media-container,
+.after-media-container,
+#afterMediaContainer {    /* include multiple selectors depending on your HTML id/class name */
+  max-width: 100%;
+  max-height: 70vh;
+  overflow: auto;        /* allow scroll instead of pushing buttons off-screen */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+/* keep overlay centered and not stretching layout */
+.video-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  background: rgba(0,0,0,0.2);
+}
 
     </style>
 </head>
@@ -1496,6 +1586,19 @@
             
             // Navigation buttons
             prevButton.addEventListener('click', () => {
+                // Unmute any playing videos when user clicks Next (user gesture allows sound)
+try {
+  activeMediaElements.forEach(el => {
+    if (el && el.tagName === 'VIDEO') {
+      el.muted = false;
+      // try to play again in case autoplay was blocked
+      el.play().catch(()=>{ /* ignore play errors */ });
+    }
+  });
+} catch(e) {
+  console.warn('Unmute-on-next failed', e);
+}
+
                 if (currentQuestionIndex > 0) {
                     // Stop any playing media
                     stopAllMedia();
@@ -2071,6 +2174,66 @@ scoreElement.textContent = score;
                 quizProgress.appendChild(dot);
             }
         }
+        // Helper: turn blob URLs into safe data URLs if possible
+// ensureDataUrl now understands IDB placeholders
+// ensureDataUrl resolves data:, http(s), blob:, AND __idb__ placeholders
+function ensureDataUrl(url) {
+  return new Promise((resolve) => {
+    try {
+      if (!url) return resolve(null);
+      if (url.startsWith('data:') || url.startsWith('http') || url.startsWith('//')) return resolve(url);
+
+      if (url.startsWith('__idb__')) {
+        const id = url.slice(7);
+        // fetch from indexeddb using helper
+        getMediaFromIDB(id).then(data => {
+          if (data) resolve(data);
+          else resolve(null);
+        }).catch(() => resolve(null));
+        return;
+      }
+
+      if (url.startsWith('blob:')) {
+        fetch(url).then(resp => resp.blob()).then(blob => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.onerror = () => resolve(url);
+          r.readAsDataURL(blob);
+        }).catch(() => resolve(url));
+        return;
+      }
+
+      resolve(url);
+    } catch (e) { resolve(url); }
+  });
+}
+
+
+// Note: index.html needs a local openMediaDB() helper — you can paste the same openMediaDB/getMediaFromIDB functions into index.html (same code from create_quiz.html).
+// Place the helper functions near the top with other utilities (before showQuestion).
+
+        /* IndexedDB helpers — store & retrieve large media */
+function openMediaDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('mediaStore', 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('media')) db.createObjectStore('media');
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+function getMediaFromIDB(id) {
+  return openMediaDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('media', 'readonly');
+    const store = tx.objectStore('media');
+    const req = store.get(id);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  }));
+}
 
         function showQuestion() {
             // Hide feedback and next button
@@ -2099,17 +2262,24 @@ scoreElement.textContent = score;
                 mediaContainer.classList.remove('hidden');
                 if (question.displayMedia.type === 'image') {
                     const img = document.createElement('img');
-                    img.src = question.displayMedia.url;
+                    ensureDataUrl(question.displayMedia.url).then((resolved) => {
+    img.src = resolved || question.displayMedia.url;
+});
+
                     img.alt = "Question media";
                     mediaContainer.appendChild(img);
                 } else {
                     const video = document.createElement('video');
-                    video.src = question.displayMedia.url;
+                    ensureDataUrl(question.displayMedia.url).then((resolved) => {
+    video.src = resolved || question.displayMedia.url;
+    video.load();
+});
+
                     video.alt = "Question media";
-                    video.autoplay = true;
+                    video.autoplay = false;
                     video.loop = true;
-                    video.muted = true;
-                    video.controls = true;
+                    video.muted = false;
+                    video.controls = false;
                     mediaContainer.appendChild(video);
                     activeMediaElements.push(video);
                 }
@@ -2198,29 +2368,76 @@ if (currentLevelId && levelScores[currentLevelId]) {
             
             // Show after-answer media in fullscreen overlay
             afterMediaContainer.innerHTML = '';
-            const question = currentQuestions[currentQuestionIndex];
-            if (question.afterMedia && question.afterMedia.url) {
-                if (question.afterMedia.type === 'image') {
-                    const img = document.createElement('img');
-                    img.src = question.afterMedia.url;
-                    img.alt = "Answer media";
-                    afterMediaContainer.appendChild(img);
-                } else {
-                    const video = document.createElement('video');
-                    video.src = question.afterMedia.url;
-                    video.alt = "Answer media";
-                    video.autoplay = true;
-                    video.loop = true;
-                    video.muted = true;
-                    video.controls = true;
-                    afterMediaContainer.appendChild(video);
-                    activeMediaElements.push(video);
-                }
-                afterMediaOverlay.style.display = 'flex';
-            } else {
-                // If no after-answer media, show next button
-                nextQuestionBtn.style.display = 'block';
-            }
+const question = currentQuestions[currentQuestionIndex];
+if (question.afterMedia && question.afterMedia.url) {
+  if (question.afterMedia.type === 'image') {
+    const img = document.createElement('img');
+    img.alt = "Answer media";
+    // resolve placeholder/blob before assigning src
+    ensureDataUrl(question.afterMedia.url).then((resolved) => {
+      const finalUrl = resolved || question.afterMedia.url;
+      img.src = finalUrl;
+      afterMediaContainer.appendChild(img);
+    }).catch(() => {
+      // fallback: try to set src directly (last resort)
+      img.src = question.afterMedia.url;
+      afterMediaContainer.appendChild(img);
+    });
+  } else {
+  const video = document.createElement('video');
+  video.alt = "Answer media";
+  // Do not autoplay; start muted, no controls
+  video.autoplay = false;
+  video.muted = true;
+  video.controls = false;
+
+  // resolve placeholder/blob before assigning src
+  ensureDataUrl(question.afterMedia.url).then((resolved) => {
+    const finalUrl = resolved || question.afterMedia.url;
+    video.src = finalUrl;
+
+    // wrapper to hold video + play button overlay
+    const wrapper = document.createElement('div');
+    wrapper.className = 'video-wrapper';
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'flex';
+    wrapper.style.justifyContent = 'center';
+    wrapper.style.alignItems = 'center';
+
+    // overlay with play button
+    const overlay = document.createElement('div');
+    overlay.className = 'video-play-overlay';
+    overlay.innerHTML = '<button type="button" class="video-play-btn" aria-label="Play">▶</button>';
+
+    // put video + overlay inside wrapper
+    wrapper.appendChild(video);
+    wrapper.appendChild(overlay);
+    afterMediaContainer.appendChild(wrapper);
+
+    // when clicked: unmute, enable controls, play, remove overlay
+    overlay.addEventListener('click', () => {
+      video.muted = false;
+      video.controls = true;
+      video.play().catch(()=>{});
+      overlay.remove();
+    });
+
+    if (typeof activeMediaElements !== 'undefined' && Array.isArray(activeMediaElements)) {
+      activeMediaElements.push(video);
+    }
+  }).catch(() => {
+    // fallback if ensureDataUrl fails
+    video.src = question.afterMedia.url;
+    afterMediaContainer.appendChild(video);
+  });
+}
+
+  afterMediaOverlay.style.display = 'flex';
+} else {
+  // If no after-answer media, show next button
+  nextQuestionBtn.style.display = 'block';
+}
+
             
             // Disable options after selection
             options.forEach(option => {
@@ -2243,7 +2460,7 @@ if (currentLevelId && levelScores[currentLevelId]) {
 
         function proceedToNextQuestion() {
             // Hide feedback and next button
-            correctFeedback.style.display = 'none'; 
+            correctFeedback.style.display = 'none';
             incorrectFeedback.style.display = 'none';
             nextQuestionBtn.style.display = 'none';
             
