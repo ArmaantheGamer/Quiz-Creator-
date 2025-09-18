@@ -310,6 +310,32 @@ function initAdmin() {
   if (saved) {
     try {
       quizData = JSON.parse(saved);
+      // Restore large media stored in IDB: replace __idb__<id> placeholders with actual data URLs
+(async function restoreMediaPlaceholders() {
+  try {
+    async function restore(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        if (v && typeof v === 'object') {
+          if (v.url && typeof v.url === 'string' && v.url.startsWith('__idb__')) {
+            const id = v.url.slice(7);
+            try {
+              const data = await getMediaFromIDB(id);
+              if (data) v.url = data;
+            } catch (e) { console.warn('failed to restore media id', id, e); }
+          } else {
+            await restore(v);
+          }
+        }
+      }
+    }
+    await restore(quizData);
+  } catch (e) {
+    console.warn('restoreMediaPlaceholders error', e);
+  }
+})();
+
       // ensure shape
       if (!quizData || !Array.isArray(quizData.quizzes)) throw new Error('bad shape');
     } catch (e) {
@@ -400,28 +426,26 @@ function initAdmin() {
 // Media type toggle handlers
 // Ensures Image/Video buttons show the correct preview element
 // Place this EXACTLY beneath the two setupMediaUpload(...) calls
+// Media type toggle handlers — placed directly beneath the two setupMediaUpload(...) lines
 document.querySelectorAll('.media-type-btn').forEach(btn => {
   btn.addEventListener('click', (ev) => {
     const type = btn.getAttribute('data-type') || btn.dataset.type;
     const forName = btn.getAttribute('data-for') || btn.dataset.for; // 'display' or 'after'
     if (!forName) return;
-
-    // deactivate siblings for the same 'for' group
     document.querySelectorAll(`.media-type-btn[data-for="${forName}"]`).forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     const img = document.getElementById(`${forName}-media-preview`);
     const vid = document.getElementById(`${forName}-video-preview`);
-
     if (type === 'image') {
       if (img) img.style.display = (img.src ? 'block' : 'none');
-      if (vid) { try { vid.pause(); } catch(e){}; vid.style.display = 'none'; /* keep src intact until new file/url set */ }
+      if (vid) { try { vid.pause(); } catch(e){}; vid.style.display = 'none'; }
     } else if (type === 'video') {
       if (vid) vid.style.display = (vid.src ? 'block' : 'none');
       if (img) img.style.display = 'none';
     }
   });
 });
+
 
 }
 
@@ -476,11 +500,104 @@ function setInputValue(value, ...ids) {
 function makeId(text) {
   return text ? text.toLowerCase().replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '') : `quiz-${Date.now()}`;
 }
+/* -------------------------
+   IndexedDB tiny helper for large media storage
+   ------------------------- */
+function openMediaDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('mediaStore', 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('media')) {
+        db.createObjectStore('media');
+      }
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function saveMediaToIDB(dataUrl) {
+  const db = await openMediaDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('media', 'readwrite');
+    const store = tx.objectStore('media');
+    const id = 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2,9);
+    const req = store.put(dataUrl, id);
+    req.onsuccess = () => resolve(id);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getMediaFromIDB(id) {
+  if (!id) return null;
+  const db = await openMediaDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('media', 'readonly');
+    const store = tx.objectStore('media');
+    const req = store.get(id);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function deleteMediaFromIDB(id) {
+  const db = await openMediaDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('media', 'readwrite');
+    const store = tx.objectStore('media');
+    const req = store.delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
 
 /* Persist quizData */
-function persist() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(quizData));
+async function persist() {
+  try {
+    // make deep copy to avoid mutating runtime objects
+    const copy = JSON.parse(JSON.stringify(quizData || {}));
+    const threshold = 200000; // 200 KB cutoff for inline storing; tune as needed
+    const idbPromises = [];
+
+    // helper to scan quiz object and replace big data URLs with IDB placeholders
+    (function scan(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        if (v && typeof v === 'object') {
+          // if this object looks like media: {type, url}
+          if (v.url && typeof v.url === 'string' && v.url.startsWith('data:') && v.url.length > threshold) {
+            // schedule moving to IDB
+            const promise = (async () => {
+              try {
+                const id = await saveMediaToIDB(v.url);
+                // replace the url with a placeholder so localStorage stays small
+                v.url = '__idb__' + id;
+              } catch (e) {
+                // if saving fails, keep original URL (may still cause quota errors)
+                console.warn('IDB save failed', e);
+              }
+            })();
+            idbPromises.push(promise);
+          } else {
+            scan(v); // recurse
+          }
+        }
+      }
+    })(copy);
+
+    // wait for IDB writes to complete
+    await Promise.all(idbPromises);
+
+    // final save to localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(copy));
+  } catch (e) {
+    console.error('persist failed', e);
+    showModal('Saving failed: storage quota may be exceeded. Consider removing large media or hosting externally.', 'error');
+  }
 }
+
 
 /* -------------------------
    Quiz saving / name
@@ -1178,29 +1295,17 @@ function setupMediaUpload(section) {
   const imgPreviewId = section === 'display' ? 'display-media-preview' : 'after-media-preview';
   const videoPreviewId = section === 'display' ? 'display-video-preview' : 'after-video-preview';
 
-  // support both admin- prefixed inputs and regular ones
   const fileEl = $id('admin-' + fileId, fileId);
   const urlEl = $id('admin-' + urlId, urlId);
   const imgPreview = $id(imgPreviewId);
   const videoPreview = $id(videoPreviewId);
 
-  // helper to hide/show previews
   const showImagePreview = (src) => {
-    if (imgPreview) {
-      imgPreview.src = src || '';
-      imgPreview.style.display = src ? 'block' : 'none';
-    }
-    if (videoPreview) {
-      try { videoPreview.pause(); } catch (e) {}
-      if (videoPreview) { videoPreview.style.display = 'none'; videoPreview.src = ''; }
-    }
+    if (imgPreview) { imgPreview.src = src || ''; imgPreview.style.display = src ? 'block' : 'none'; }
+    if (videoPreview) { try { videoPreview.pause(); } catch (e) {} videoPreview.style.display = 'none'; videoPreview.src = ''; }
   };
   const showVideoPreview = (src) => {
-    if (videoPreview) {
-      videoPreview.src = src || '';
-      videoPreview.style.display = src ? 'block' : 'none';
-      try { videoPreview.load(); videoPreview.currentTime = 0; } catch(e){}
-    }
+    if (videoPreview) { videoPreview.src = src || ''; videoPreview.style.display = src ? 'block' : 'none'; try { videoPreview.load(); videoPreview.currentTime = 0; } catch(e){} }
     if (imgPreview) imgPreview.style.display = 'none';
   };
 
@@ -1208,40 +1313,34 @@ function setupMediaUpload(section) {
     fileEl.addEventListener('change', (e) => {
       const f = e.target.files && e.target.files[0];
       if (!f) return;
-      const url = URL.createObjectURL(f);
-
-      // decide by mime type
-      if (f.type && f.type.startsWith('video')) {
-        // show video preview
-        showVideoPreview(url);
-      } else {
-        // show image preview
-        showImagePreview(url);
-      }
-
-      // set url field to object URL (optional)
-      if (urlEl && 'value' in urlEl) urlEl.value = url;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const dataUrl = evt.target.result;
+        if (f.type && f.type.startsWith('video')) showVideoPreview(dataUrl);
+        else showImagePreview(dataUrl);
+        if (urlEl && 'value' in urlEl) urlEl.value = dataUrl;
+      };
+      reader.onerror = function() {
+        // fallback to objectURL if reading fails
+        const url = URL.createObjectURL(f);
+        if (f.type && f.type.startsWith('video')) showVideoPreview(url);
+        else showImagePreview(url);
+        if (urlEl && 'value' in urlEl) urlEl.value = url;
+      };
+      reader.readAsDataURL(f);
     });
   }
 
   if (urlEl) {
     urlEl.addEventListener('input', (e) => {
-      const v = (e.target.value || '').trim();
-      if (!v) {
-        if (imgPreview) imgPreview.style.display = 'none';
-        if (videoPreview) videoPreview.style.display = 'none';
-        return;
-      }
-      // Heuristic: if url ends with common video extensions or contains "youtube/vimeo", treat as video
-      const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(v) || /youtube\.com|youtu\.be|vimeo\.com/i.test(v);
-      if (isVideo) {
-        showVideoPreview(v);
-      } else {
-        showImagePreview(v);
-      }
+      const v = e.target.value.trim();
+      if (!v) { if (imgPreview) imgPreview.style.display='none'; if (videoPreview) videoPreview.style.display='none'; return; }
+      const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(v) || /youtube\.com|youtu\.be|vimeo\.com/i.test(v) || v.startsWith('data:video');
+      if (isVideo) showVideoPreview(v); else showImagePreview(v);
     });
   }
 }
+
 
 
 /* -------------------------
