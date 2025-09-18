@@ -1004,6 +1004,6 @@ p {
     box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4) !important;
 }
 
-.save-btn-editing:hover {
+.save-btn-editing:hover { 
     background: linear-gradient(to bottom, #ff6b00, #e65c00) !important;
 }
