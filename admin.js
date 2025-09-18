@@ -660,3 +660,4 @@ function resetQuestions() {
 
 // Initialize the admin panel
 initAdmin();
+ 
